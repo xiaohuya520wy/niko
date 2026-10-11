@@ -1368,6 +1368,32 @@ function featuredEvent(){
   return EVS.find(x => x.id === (d.featured && d.featured.id)) || EVS[0];
 }
 
+/* 法尔孔是否还会在某赛事打比赛（仍有未开打 / 进行中的场次）。
+   用途：判断「当前已开打的赛事，法尔孔是仍在打还是已经被淘汰出局」。
+   被淘汰的当前赛事（已在打、但法尔孔已无下一场）不应再作为首页 hero 的
+   「下一站赛事」展示，应直接跳到下一个预告赛事。
+   匹配按 short / name / id；抓不到明细时保守返回 false（避免把已淘汰赛事当未来赛事）。 */
+function falconsStillIn(t){
+  if(!t) return false;
+  const EVS = (evData().events || []);
+  const e = EVS.find(x => x.short === t.short || x.name === t.name
+                        || (t.id && x.id === t.id));
+  if(!e) return false;
+  const now = Date.now() / 1000;
+  const hasUpcoming = (m) => {
+    const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
+    const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
+    if(!an || !bn) return false;
+    if(!/falcon/i.test(an + ' ' + bn)) return false;
+    const ts = matchTs(m);
+    return ts && ts >= now;
+  };
+  for(const m of (e.schedule || [])) if(hasUpcoming(m)) return true;
+  for(const b of (e.brackets || [])) for(const rd of (b.rounds || []))
+    for(const m of (rd.matches || [])) if(hasUpcoming(m)) return true;
+  return false;
+}
+
 /* 数据质量分 = 系列赛场次数 + 赛季统计场次数。
    上游定时任务一旦抓取失败，会产出「结构完整但 recent_matches 为空」的
    data.json 并覆盖仓库里的好数据；若照单全收，页面会从有数据瞬间变成全是 0。
