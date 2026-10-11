@@ -1,0 +1,33 @@
+{
+  "born": "February 16, 1997",
+  "age": 29,
+  "status": "Active",
+  "years_active": "2009 – Present",
+  "role_liq": "Entry",
+  "winnings": "2,011,746",
+  "mouse": "Razer DeathAdder V3 Pro",
+  "edpi": "720",
+  "dpi": "1600",
+  "polling": "1000 Hz",
+  "sens": "0.45",
+  "zoom_sens": "1",
+  "raw_input": "On",
+  "mousepad": "Razer Gigantus V2 (Large)",
+  "monitor": "ZOWIE XL2566K",
+  "refresh": "360 Hz",
+  "resolution": "1024×768 Stretched",
+  "keyboard": "Razer Huntsman V3 Pro TKL",
+  "headset": "Razer BlackShark V2 Pro",
+  "crosshair": {
+    "style": "4",
+    "size": "1",
+    "thickness": "1",
+    "sniper_width": "1",
+    "gap": "-4",
+    "outline": "No",
+    "dot": "No",
+    "color": "5",
+    "alpha": "255"
+  },
+  "sharecode": "CSGO-OFKZZ-mZp9n-KXx4x-2SmEp-jcYHK"
+}

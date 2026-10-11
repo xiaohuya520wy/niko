@@ -1,0 +1,266 @@
+{
+  "squad": [
+    {
+      "id": "NiKo",
+      "name": "Nikola Kovač",
+      "native_name": "Никола Ковач",
+      "nationality": "波黑",
+      "born": "1997 年 2 月 16 日",
+      "age": 29,
+      "role": "步枪手",
+      "role_raw": "Entry",
+      "role_zh": "步枪手",
+      "note": "核心 — 世界上最好的步枪手之一",
+      "status": "现役",
+      "years_active": "2009 年至今",
+      "team": "Team Falcons",
+      "winnings": "$2,011,746",
+      "nicknames": "",
+      "alt_ids": "NiKolinho, nIKOLINHO, NiKOLINHO, nik0k0, niko",
+      "history": [
+        {
+          "from": "2013-12-16",
+          "to": "2014-03-21",
+          "team": "GamePub"
+        },
+        {
+          "from": "2014-08-21",
+          "to": "2015-01-11",
+          "team": "aimface"
+        },
+        {
+          "from": "2015-08-30",
+          "to": "2017-02-19",
+          "team": "mousesports"
+        },
+        {
+          "from": "2017-02-19",
+          "to": "2020-10-28",
+          "team": "FaZe Clan"
+        },
+        {
+          "from": "2020-10-28",
+          "to": "2025-01-03",
+          "team": "G2 Esports"
+        }
+      ],
+      "url": "https://liquipedia.net/counterstrike/NiKo",
+      "photo": "assets/players/NiKo.jpg"
+    },
+    {
+      "id": "TeSeS",
+      "name": "René Stensig Madsen",
+      "native_name": "René Stensig Madsen",
+      "nationality": "丹麦",
+      "born": "2000 年 12 月 12 日",
+      "age": 25,
+      "role": "步枪手",
+      "role_raw": "Entry",
+      "role_zh": "步枪手",
+      "note": "自由人 — 丹麦老将，稳定输出点",
+      "status": "现役",
+      "years_active": "2016 年至今",
+      "team": "Team Falcons",
+      "winnings": "$1,029,013",
+      "nicknames": "",
+      "alt_ids": "",
+      "history": [
+        {
+          "from": "2018-03-25",
+          "to": "2018-10-01",
+          "team": "Squared Esports"
+        },
+        {
+          "from": "2018-10-01",
+          "to": "2019-06-10",
+          "team": "GoldenGitte"
+        },
+        {
+          "from": "2019-10-14",
+          "to": "2019-11-12",
+          "team": "CPH Flames"
+        },
+        {
+          "from": "2019-11-12",
+          "to": "2020-04-08",
+          "team": "Copenhagen Flames"
+        },
+        {
+          "from": "2020-04-08",
+          "to": "2025-01-04",
+          "team": "HEROIC"
+        }
+      ],
+      "url": "https://liquipedia.net/counterstrike/TeSeS",
+      "photo": "assets/players/TeSeS.jpg"
+    },
+    {
+      "id": "m0NESY",
+      "name": "Ilya Osipov",
+      "native_name": "Илья Осипов",
+      "nationality": "俄罗斯",
+      "born": "2005 年 5 月 1 日",
+      "age": 21,
+      "role": "狙击手",
+      "role_raw": "AWPer",
+      "role_zh": "狙击手",
+      "note": "AWP 手 — 世界顶级狙击手",
+      "status": "现役",
+      "years_active": "2019 年至今",
+      "team": "Team Falcons",
+      "winnings": "$1,125,844",
+      "nicknames": "Yellow Flash, The Flash, Baby GOAT",
+      "alt_ids": "m0",
+      "history": [
+        {
+          "from": "2019-07-04",
+          "to": "2019-10-10",
+          "team": "NewBALLS"
+        },
+        {
+          "from": "2021-12-08",
+          "to": "2022-01-03",
+          "team": "NAVI Junior"
+        },
+        {
+          "from": "2020-01-21",
+          "to": "2021-03-11",
+          "team": "NAVI Jr."
+        },
+        {
+          "from": "2021-03-11",
+          "to": "2021-12-08",
+          "team": "Natus Vincere Junior"
+        },
+        {
+          "from": "2022-01-03",
+          "to": "2025-04-14",
+          "team": "G2 Esports"
+        }
+      ],
+      "url": "https://liquipedia.net/counterstrike/m0NESY",
+      "photo": "assets/players/m0NESY.jpg"
+    },
+    {
+      "id": "kyousuke",
+      "name": "Maksim Lukin",
+      "native_name": "Максим Лукин",
+      "nationality": "俄罗斯",
+      "born": "2008 年 1 月 30 日",
+      "age": 18,
+      "role": "步枪手",
+      "role_raw": "Entry",
+      "role_zh": "步枪手",
+      "note": "突破手 — 新生代新星",
+      "status": "现役",
+      "years_active": "2024 年至今",
+      "team": "Team Falcons",
+      "winnings": "$313,613",
+      "nicknames": "",
+      "alt_ids": "CEMEN_BAKIN",
+      "history": [
+        {
+          "from": "2024-03-26",
+          "to": "2025-06-23",
+          "team": "Team Spirit Academy"
+        }
+      ],
+      "url": "https://liquipedia.net/counterstrike/kyousuke",
+      "photo": "assets/players/kyousuke.jpg"
+    },
+    {
+      "id": "karrigan",
+      "name": "Finn Andersen",
+      "native_name": "Finn Andersen",
+      "nationality": "丹麦",
+      "born": "1990 年 4 月 14 日",
+      "age": 36,
+      "role": "指挥",
+      "role_raw": "",
+      "role_zh": "指挥",
+      "note": "指挥 — 传奇 IGL，队伍大脑",
+      "status": "现役",
+      "years_active": "2006 年至今",
+      "team": "Team Falcons",
+      "winnings": "$2,333,141",
+      "nicknames": "",
+      "alt_ids": "karrigaNaStYa, FiNNiGAN, FiNNiGANastya, KARRYGAN",
+      "history": [
+        {
+          "from": "2014-06-06",
+          "to": "2014-10-10",
+          "team": "Copenhagen Wolves"
+        },
+        {
+          "from": "2014-12-09",
+          "to": "2015-01-25",
+          "team": "Team Dignitas"
+        },
+        {
+          "from": "2015-01-29",
+          "to": "2015-12-03",
+          "team": "Team SoloMid"
+        },
+        {
+          "from": "2016-10-11",
+          "to": "2016-10-19",
+          "team": "Astralis"
+        },
+        {
+          "from": "2018-12-16",
+          "to": "2019-03-14",
+          "team": "FaZe Clan"
+        }
+      ],
+      "url": "https://liquipedia.net/counterstrike/karrigan",
+      "photo": "assets/players/karrigan.jpg"
+    },
+    {
+      "id": "zonic",
+      "name": "Danny Selim Sørensen",
+      "native_name": "Danny Selim Sørensen",
+      "nationality": "丹麦",
+      "born": "1986 年 7 月 30 日",
+      "age": 40,
+      "role": "教练",
+      "role_raw": "Coach",
+      "role_zh": "教练",
+      "note": "主教练 — 四届 Major 冠军教头",
+      "status": "现役",
+      "years_active": "2003 年 – 2012 年",
+      "team": "Team Falcons",
+      "winnings": "$119,680",
+      "nicknames": "",
+      "alt_ids": "",
+      "history": [
+        {
+          "from": "2015-12-10",
+          "to": "2016-01-04",
+          "team": "mTw"
+        },
+        {
+          "from": "2011-12-08",
+          "to": "2012-03-17",
+          "team": "mousesports"
+        },
+        {
+          "from": "2015-07-29",
+          "to": "2015-12-10",
+          "team": "Team Dignitas"
+        },
+        {
+          "from": "2021-11-04",
+          "to": "2021-12-29",
+          "team": "Astralis"
+        },
+        {
+          "from": "2022-01-05",
+          "to": "2023-10-11",
+          "team": "Team Vitality"
+        }
+      ],
+      "url": "https://liquipedia.net/counterstrike/zonic",
+      "photo": "assets/players/zonic.jpg"
+    }
+  ]
+}

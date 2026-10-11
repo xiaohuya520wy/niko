@@ -1,0 +1,24 @@
+name: HLTV rating probe
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/hltv_probe.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe HLTV map stats page
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+          for u in "https://www.hltv.org/stats/matches/mapstatsid/237122/-" "https://www.hltv.org/stats/players/7998/niko"; do
+            echo "=== $u ==="
+            code=$(curl -s -L -m 30 -A "$UA" -o /tmp/h.html -w "%{http_code}" "$u" || echo "curl-fail")
+            echo "http_code=$code size=$(wc -c < /tmp/h.html) challenge=$(grep -c -i 'just a moment' /tmp/h.html || true) niko=$(grep -c 'NiKo' /tmp/h.html || true)"
+            head -c 200 /tmp/h.html || true
+            echo
+            sleep 3
+          done

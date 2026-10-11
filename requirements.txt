@@ -1,0 +1,9 @@
+# NiKo 赛事跟踪站 · Python 依赖
+#
+# 说明：本项目主流程只用标准库，Scrapling 是「可选增强」——
+# parse_event_sl.py 里做了探测，没装就自动降级为纯正则解析，流程不受影响。
+#
+# 这里只用 scrapling 的 Selector（纯解析，轻量，无需下载浏览器）。
+# 反爬浏览器（scrapling[fetchers]，含几百 MB Chromium）不需要装：
+# HLTV 评分回补设计成本机抓取 + ratings.json 持久化，不依赖 CI 具备反爬能力。
+scrapling>=0.4,<1

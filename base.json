@@ -1,0 +1,60 @@
+{
+  "player": {
+    "nick": "NiKo",
+    "full_name": "Nikola Kovač",
+    "country": "波黑",
+    "age": 29,
+    "team": "Team Falcons",
+    "joined": "2025-01-03",
+    "role": "步枪手",
+    "teammates": ["karrigan", "m0NESY", "TeSeS", "kyousuke"],
+    "coach": "zonic",
+    "team_rank": 2,
+    "team_points": 1854,
+    "rating_3m": 1.13,
+    "maps_3m": 43,
+    "career": {"kills": 46073, "kd": 1.18, "adr": 84.6, "kpr": 0.78, "hs": 51.4, "maps": 2311, "mvp": 10, "top20": 10},
+    "major": {"title": "IEM Cologne Major 2026", "date": "2026-06-21", "result": "3-0 胜 FURIA", "note": "职业生涯首个 Major 冠军，距首次 Major 决赛 3067 天"},
+    "born": "1997 年 2 月 16 日",
+    "years_active": "2009 年至今",
+    "status": "现役",
+    "winnings": "$2,011,746",
+    "role_liq": "突破位",
+    "gear": {
+      "mouse": "Razer DeathAdder V3 Pro",
+      "mousepad": "Razer Gigantus V2 (Large)",
+      "edpi": "720",
+      "dpi": "1600",
+      "sens": "0.45",
+      "polling": "1000 Hz",
+      "zoom_sens": "1",
+      "raw_input": "开",
+      "monitor": "ZOWIE XL2566K",
+      "refresh": "360 Hz",
+      "resolution": "1024×768 拉伸",
+      "keyboard": "Razer Huntsman V3 Pro TKL",
+      "headset": "Razer BlackShark V2 Pro"
+    },
+    "crosshair": {"style": "4", "size": "1", "thickness": "1", "sniper_width": "1", "gap": "-4", "outline": "否", "dot": "否", "color": "5", "alpha": "255"},
+    "crosshair_sharecode": "CSGO-OFKZZ-mZp9n-KXx4x-2SmEp-jcYHK"
+  },
+  "next_match": null,
+  "upcoming_tournaments": [
+    {"short": "EPL S24", "date_text": "10/03–11", "start": "2026-10-03T09:00:00Z", "end": "2026-10-11T23:59:59Z", "name": "ESL Pro League Season 24", "tier": "S-Tier", "note": ""},
+    {"short": "IEM 北京", "date_text": "11/02–08", "start": "2026-11-02T10:00:00Z", "end": "2026-11-08T23:59:59Z", "name": "IEM 北京 2026", "tier": "S-Tier", "note": "奖金 125 万美元"}
+  ],
+  "known_ratings": [
+    {"date": "2026-09-04", "opponent": "G2", "ratings": [1.54]},
+    {"date": "2026-09-05", "opponent": "Spirit", "ratings": [0.72, 0.89]},
+    {"date": "2026-08-31", "opponent": "MOUZ", "ratings": [0.38]},
+    {"date": "2026-08-21", "opponent": "Legacy", "ratings": [0.76]},
+    {"date": "2026-08-13", "opponent": "Astralis", "ratings": [1.52]}
+  ],
+  "meta": {
+    "sources": [
+      {"name": "Liquipedia Counter-Strike Wiki", "license": "CC-BY-SA 3.0", "url": "https://liquipedia.net/counterstrike"},
+      {"name": "HLTV.org", "url": "https://www.hltv.org"}
+    ],
+    "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。"
+  }
+}

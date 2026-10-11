@@ -1,0 +1,14 @@
+name = "niko-scheduler"
+main = "index.js"
+compatibility_date = "2024-11-01"
+account_id = "aff61d5c116fb8cab7c657535424d0c1"
+
+# 非敏感配置（仓库可见，无妨）
+[vars]
+GH_OWNER = "xiaohuya520wy"
+GH_REPO = "niko"
+GH_WORKFLOW = "refresh.yml"
+
+# 每 5 分钟派发一次 refresh.yml（CF 的 cron 比 GitHub 原生 cron 稳得多）
+[triggers]
+crons = ["*/5 * * * *"]

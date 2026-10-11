@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "updated": "2026-09-07T20:30:00+08:00",
+    "sources": [
+      { "name": "Liquipedia Counter-Strike Wiki", "license": "CC-BY-SA 3.0", "url": "https://liquipedia.net/counterstrike" },
+      { "name": "HLTV.org", "url": "https://www.hltv.org" }
+    ],
+    "note": "个人 rating 数据来自 HLTV；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间 (UTC+8)。"
+  },
+  "player": {
+    "nick": "NiKo",
+    "full_name": "Nikola Kovač",
+    "country": "波黑",
+    "age": 29,
+    "team": "Team Falcons",
+    "joined": "2025-01-03",
+    "role": "Rifler",
+    "teammates": ["karrigan", "m0NESY", "TeSeS", "kyousuke"],
+    "coach": "zonic",
+    "team_rank": 2,
+    "team_points": 1854,
+    "rating_3m": 1.13,
+    "maps_3m": 43,
+    "career": {
+      "kills": 46073,
+      "kd": 1.18,
+      "adr": 84.6,
+      "kpr": 0.78,
+      "hs": 51.4,
+      "maps": 2311,
+      "mvp": 10,
+      "top20": 10
+    },
+    "major": {
+      "title": "IEM Cologne Major 2026",
+      "date": "2026-06-21",
+      "result": "3-0 胜 FURIA",
+      "note": "职业生涯首个 Major 冠军，距首次 Major 决赛 3067 天"
+    }
+  },
+  "next_match": null,
+  "upcoming_tournaments": [
+    {
+      "name": "ESL Pro League Season 24",
+      "short": "EPL S24",
+      "tier": "S-Tier",
+      "date_text": "10月3日 – 11日",
+      "start": "2026-10-03T00:00:00Z",
+      "status": "opponent_tbd",
+      "url": "https://liquipedia.net/counterstrike/ESL/Pro_League/Season_24"
+    },
+    {
+      "name": "IEM Beijing 2026",
+      "short": "IEM 北京",
+      "tier": "S-Tier",
+      "date_text": "11月2日 – 8日",
+      "start": "2026-11-02T00:00:00Z",
+      "status": "opponent_tbd",
+      "url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/2026/Beijing"
+    }
+  ],
+  "recent_matches": [
+    {
+      "date": "2026-09-05T14:00:00Z",
+      "opponent": "Spirit",
+      "score": "0-2",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "BLAST 波尔图公开赛",
+      "stage": "半决赛",
+      "niko": { "ratings": [0.72, 0.89], "note": "两图合计 0.81" }
+    },
+    {
+      "date": "2026-09-04T14:00:00Z",
+      "opponent": "G2 Esports",
+      "score": "2-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "BLAST 波尔图公开赛",
+      "stage": "1/4 决赛",
+      "maps": "Inferno 13-6 / Dust2 13-9",
+      "niko": { "ratings": [2.22, 1.02], "kd": "37-24", "adr": 92.3, "note": "系列赛 1.54 rating，图一 2.22" }
+    },
+    {
+      "date": "2026-08-31T15:35:00Z",
+      "opponent": "MOUZ",
+      "score": "1-2",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "BLAST 波尔图公开赛",
+      "stage": "小组赛 胜者组决赛",
+      "niko": { "ratings": [0.38], "note": "系列赛最低点" }
+    },
+    {
+      "date": "2026-08-29T16:45:00Z",
+      "opponent": "Legacy",
+      "score": "2-1",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "BLAST 波尔图公开赛",
+      "stage": "小组赛 胜者组半决赛",
+      "niko": { "ratings": [] }
+    },
+    {
+      "date": "2026-08-27T17:10:00Z",
+      "opponent": "Lynn Vision Gaming",
+      "score": "2-1",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "BLAST 波尔图公开赛",
+      "stage": "小组赛 胜者组 1/4 决赛",
+      "niko": { "ratings": [] }
+    },
+    {
+      "date": "2026-08-21T13:50:00Z",
+      "opponent": "Legacy",
+      "score": "0-2",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "电竞世界杯 2026",
+      "stage": "1/4 决赛",
+      "niko": { "ratings": [0.76], "kd": "22-32", "adr": 68.5, "note": "赛后采访：很久没被打得这么惨" }
+    },
+    {
+      "date": "2026-08-20T11:00:00Z",
+      "opponent": "The MongolZ",
+      "score": "2-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "电竞世界杯 2026",
+      "stage": "16 强",
+      "niko": { "ratings": [] }
+    },
+    {
+      "date": "2026-08-13T16:40:00Z",
+      "opponent": "Astralis",
+      "score": "2-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "电竞世界杯 2026",
+      "stage": "小组赛 B 组",
+      "maps": "Ancient 13-7 / Dust2 13-11",
+      "niko": { "ratings": [1.52], "kd": "41-24", "note": "全场最高 rating" }
+    },
+    {
+      "date": "2026-08-12T13:45:00Z",
+      "opponent": "K27",
+      "score": "13-6",
+      "result": "W",
+      "bo": "Bo1",
+      "event": "电竞世界杯 2026",
+      "stage": "小组赛 B 组",
+      "niko": { "ratings": [] }
+    }
+  ]
+}

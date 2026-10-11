@@ -1,0 +1,120 @@
+name: Update NiKo data
+
+# 全量管线：重建 data.json（NiKo 的历史战绩、逐图详情、HLTV 链接）。
+#
+# 跑一次约 11 分钟 —— 瓶颈是 Liquipedia action=parse 限流 1 次/30 秒，
+# 二十来个赛事页必须逐个等。所以频率定成每 6 小时一次，真正的实时比分
+# 交给 refresh.yml（每 5 分钟只刷还没结束的赛事，几十秒跑完）。
+#
+# 刻意不挂 push 触发：一次全量跑要十来分钟，而改页面/改样式根本不需要它。
+# 另外它和 refresh.yml 都会 git push，若同一个 push 同时触发两者容易抢远端分支。
+# 管线代码改完用 workflow_dispatch 手动验一次即可，日常刷新交给 schedule。
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: niko-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      LANG: C.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 恢复 Scrapling 指纹缓存
+        uses: actions/cache@v4
+        with:
+          path: _cache/scrapling
+          key: scrapling-fp-${{ github.run_id }}
+          restore-keys: scrapling-fp-
+
+      - name: 整理文件到根目录
+        run: |
+          if [ -d niko-upload ]; then
+            cp -r niko-upload/. .
+            rm -rf niko-upload
+          fi
+
+      # 退出码: 0=正常 | 2=解析器疑似失效（event.json 已保留旧数据并打 parse_warning）
+      - name: Run pipeline
+        continue-on-error: true
+        run: python run.py
+
+      - name: Commit & push
+        id: commit
+        run: |
+          rm -rf __pycache__
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config core.quotepath false
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "auto: update NiKo data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            # 全量跑要十几分钟，期间 refresh.yml 会插进来提交好几次 event.json，
+            # 所以推送必须重放后重试，否则这一个 commit 会因为远端已前进而丢失。
+            # ⚠ 用裸 `git pull --rebase` 会翻车：两边都改 event.json 时 rebase 产生
+            #   内容冲突，进入冲突状态后每次重试都被 "unmerged files" 挡回来，
+            #   5 次全废（2026-10-05 实测）。改成 -X theirs：本次管线刚生成的数据
+            #   就是最新，冲突一律以本次为准；refresh.yml 新增的队标等文件照样保留。
+            ok=0
+            for i in 1 2 3 4 5; do
+              git rebase --abort 2>/dev/null || true
+              if git pull --rebase -X theirs origin main && git push origin HEAD:main; then
+                ok=1; break
+              fi
+              git rebase --abort 2>/dev/null || true
+              sleep $((i * 5))
+            done
+            if [ "$ok" != "1" ]; then echo "push 失败（已重试 5 次）"; exit 1; fi
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # jsDelivr 对 @分支 引用有约 12 小时缓存，而前端轮询的第一站是 jsDelivr。
+      # 提交之后必须主动清缓存，否则新数据要等半天才能传到用户页面。
+      - name: Purge jsDelivr cache
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          for f in data.json event.json photos.json players.json; do
+            curl -s "https://purge.jsdelivr.net/gh/xiaohuya520wy/niko@main/$f"
+            echo " purged $f"
+          done
+
+      - name: 自动开/更新降级告警 Issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create auto-alert --description "Liquipedia 改版致解析器失效自动告警" --color b3261e || true
+          cat > alert_body.md <<'EOF'
+          全量管线运行失败，赛事解析器疑似被 Liquipedia 改版打挂。
+
+          event.json 已保留最近一次正常抓取的旧数据并打上 parse_warning 标记，
+          线上赛事中心会显示降级横幅，站点不会空白。
+
+          建议按顺序排查：
+          1. parse_event.py 的分组 / 分支图 / Upcoming Matches 解析逻辑是否要跟进新模板；
+          2. parse_event_sl.py 的强判据是否也已失效；
+          3. run.py 里从 event.json 动态派生的赛事页是否还能拿到内容。
+          EOF
+          TITLE="⚠ 全量管线失败：解析器疑似被 Liquipedia 改版打挂"
+          EXIST=$(gh issue list --state open --label auto-alert --json number --jq '.[0].number' || true)
+          if [ -n "$EXIST" ]; then
+            gh issue comment "$EXIST" --body-file alert_body.md
+          else
+            gh issue create --title "$TITLE" --label auto-alert --body-file alert_body.md
+          fi

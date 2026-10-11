@@ -1,0 +1,131 @@
+name: Refresh live scores
+
+# 只刷新 event.json（赛事分组/分支图/赛程/逐图详情），不动 data.json、不重建页面。
+#
+# 为什么拆开：页面是静态的，但前端每 60 秒会去远端拉 event.json（带时间戳破 CDN 缓存），
+# 所以「后端把 event.json 提交上去」就等于「线上比分更新了」，完全不需要重新 build。
+# 这样一次快刷只抓 1~2 个还没结束的赛事页，几十秒跑完，才能撑得起 5 分钟一次的频率；
+# 而全量管线（data.json，二十来Page 受 Liquipedia 30 秒/次限流约 11 分钟）单独低频跑。
+#
+# ⚠ 历史教训：本文件曾经因为 gh issue --body 里写了跨行的中文导致 YAML 解析失败，
+#   GitHub 于是既注册不了 cron，push 触发也全是 0 秒失败 —— 管线悄悄停摆了很久。
+#   所以下面所有多行文本都改成 here-doc 写进正文文件，绝不用跨行带引号标量。
+#   改完务必本地验证 YAML：python -c "import yaml;yaml.safe_load(open(...))"
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "data.json"
+      - "event.json"
+      - "*.md"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: niko-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      LANG: C.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Scrapling 自适应指纹库：跨运行保留，页面改版时能靠历史指纹重新定位元素
+      - name: 恢复 Scrapling 指纹缓存
+        uses: actions/cache@v4
+        with:
+          path: _cache/scrapling
+          key: scrapling-fp-refresh
+          restore-keys: scrapling-fp-
+
+      - name: 安装可选依赖
+        continue-on-error: true
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # --live-only：跳过已结束赛事（内容已定型），保留旧数据，只重抓进行中/未开赛的
+      - name: 刷新赛事数据
+        continue-on-error: true
+        run: python fetch_event.py --live-only
+
+      - name: 提交 event.json
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config core.quotepath false
+          git add event.json
+          git add assets/teams 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "event.json 无变化，跳过提交"
+          else
+            git commit -m "auto: refresh event.json $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            # 必须能扛并发：本工作流每 5 分钟跑一次，还可能和 6 小时一次的全量
+            # update.yml 撞在同一个时间点抢远端分支。
+            # ⚠ 裸的 `git pull --rebase` 在这里翻过车：两边都改了 event.json 时
+            #   rebase 会产生内容冲突，一旦进入冲突状态，之后每次重试都被
+            #   "Pulling is not possible because you have unmerged files" 挡回来，
+            #   5 次重试全废、整个 run 变红（2026-10-05 实测 run #7）。
+            #   改成 -X theirs：event.json 由本脚本独占生成，本次抓到的就是最新，
+            #   冲突一律以本次为准；远端新增的文件（如新队标）照样保留。
+            #   每次重试前先 --abort，清掉可能残留的冲突状态。
+            ok=0
+            for i in 1 2 3 4 5; do
+              git rebase --abort 2>/dev/null || true
+              if git pull --rebase -X theirs origin main && git push origin HEAD:main; then
+                ok=1; break
+              fi
+              git rebase --abort 2>/dev/null || true
+              sleep $((i * 5))
+            done
+            if [ "$ok" != "1" ]; then echo "push 失败（已重试 5 次）"; exit 1; fi
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 必须清：jsDelivr 对 @分支 引用有约 12 小时缓存，而前端轮询的第一站正是 jsDelivr。
+      # 不主动清的话，Actions 早就提交了新比分，用户却可能还要等半天才刷得出来——
+      # 「刷新慢」的另一半原因在这儿。（前端虽有 ?t= 时间戳，但不一定能穿透 CDN 缓存键）
+      - name: Purge jsDelivr cache
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          curl -s "https://purge.jsdelivr.net/gh/xiaohuya520wy/niko@main/event.json"
+          echo "purged event.json"
+
+      # 解析器被 Liquipedia 改版打挂时自动告警（event.json 已保留旧数据，站点不会空白）
+      - name: 自动开/更新降级告警 Issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create auto-alert --description "Liquipedia 改版致解析器失效自动告警" --color b3261e || true
+          cat > alert_body.md <<'EOF'
+          本次快刷未能正常完成，赛事解析器疑似被 Liquipedia 改版打挂。
+
+          event.json 已保留最近一次正常抓取的旧数据，线上赛事中心会显示降级横幅，站点不会空白。
+
+          请检查：
+          1. parse_event.py 的分组 / 分支图 / Upcoming Matches 解析逻辑是否要跟进新模板；
+          2. parse_event_sl.py 的强判据是否也已失效；
+          3. Liquipedia 是否已改用新的数据属性。
+          EOF
+          TITLE="⚠ 赛事快刷失败：解析器疑似被 Liquipedia 改版打挂"
+          EXIST=$(gh issue list --state open --label auto-alert --json number --jq '.[0].number' || true)
+          if [ -n "$EXIST" ]; then
+            gh issue comment "$EXIST" --body-file alert_body.md
+          else
+            gh issue create --title "$TITLE" --label auto-alert --body-file alert_body.md
+          fi

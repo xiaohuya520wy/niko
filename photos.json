@@ -1,0 +1,146 @@
+[
+ {
+  "src": "assets/photos/niko_at_blast_open_spring_2026.jpg",
+  "caption": "BLAST Open Spring 2026",
+  "year": 2026,
+  "recent": true
+ },
+ {
+  "src": "assets/photos/niko_at_iem_katowice_2025.jpg",
+  "caption": "IEM Katowice 2025",
+  "year": 2025,
+  "recent": true
+ },
+ {
+  "src": "assets/photos/niko_at_copenhagen_major_2024_eu_rmr.jpg",
+  "caption": "Copenhagen Major 欧洲 RMR 2024",
+  "year": 2024,
+  "recent": true
+ },
+ {
+  "src": "assets/photos/niko_at_iem_cologne_2023.jpg",
+  "caption": "IEM Cologne 2023",
+  "year": 2023,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_antwerp_major_2022_eu_rmr.jpg",
+  "caption": "Antwerp Major 欧洲 RMR 2022",
+  "year": 2022,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_rio_major_2022_eu_rmr.jpg",
+  "caption": "Rio Major 欧洲 RMR 2022",
+  "year": 2022,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_iem_cologne_2021.jpg",
+  "caption": "IEM Cologne 2021",
+  "year": 2021,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_iem_katowice_2020.jpg",
+  "caption": "IEM Katowice 2020",
+  "year": 2020,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_iem_beijing_2019.jpg",
+  "caption": "IEM Beijing 2019",
+  "year": 2019,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_iem_katowice_2019.jpg",
+  "caption": "IEM Katowice 2019",
+  "year": 2019,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_dh_masters_stockholm_2018.jpg",
+  "caption": "DreamHack Masters Stockholm 2018",
+  "year": 2018,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_eleague_major_boston_2018.jpg",
+  "caption": "ELEAGUE Major Boston 2018",
+  "year": 2018,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_epicenter_2018.jpg",
+  "caption": "EPICENTER 2018",
+  "year": 2018,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_iem_sydney_2018.jpg",
+  "caption": "IEM Sydney 2018",
+  "year": 2018,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_epicenter_2017.jpg",
+  "caption": "EPICENTER 2017",
+  "year": 2017,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_iem_sydney_2017.jpg",
+  "caption": "IEM Sydney 2017",
+  "year": 2017,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_dh_stockholm_2015.jpg",
+  "caption": "DreamHack Stockholm 2015",
+  "year": 2015,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_eslm_spring_2015_finals.jpg",
+  "caption": "ESL Masters Spring 总决赛 2015",
+  "year": 2015,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_iem_gamescom_2015.jpg",
+  "caption": "IEM Gamescom 2015",
+  "year": 2015,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_bgf_2013.jpg",
+  "caption": "BGF 2013",
+  "year": 2013,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_at_dhm_malm.jpg",
+  "caption": "DreamHack Masters Malmö",
+  "year": 0,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_epl_s4_finals.jpg",
+  "caption": "EPL S4 总决赛",
+  "year": 0,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_esl_pro_league_season_9_finals.jpg",
+  "caption": "ESL Pro League S9 总决赛",
+  "year": 0,
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_esports_heaven_vienna.jpg",
+  "caption": "Esports Heaven Vienna",
+  "year": 0,
+  "recent": false
+ }
+]
