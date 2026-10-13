@@ -14,6 +14,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+from html import unescape
 
 import parse_event as PE
 import parse_detail as PD
@@ -31,20 +32,62 @@ UA = {"User-Agent": "NikoTracker/1.0 (personal CS2 fan page; contact: user@examp
 # 缓存文件名与页面名不一致时的别名
 CACHE_ALIAS = {"ESL/Pro League/Season 24": "epl_s24.html"}
 
-# 展示用配置（tag: next=当前/下一站, recent=最近赛事）
-CONFIG = [
-    {"page": "ESL/Pro League/Season 24", "zh": "ESL 职业联赛 S24", "short": "EPL S24",
-     "tag": "next", "tier": "S-Tier", "match": "ESL Pro League"},
-    {"page": "Intel Extreme Masters/2026/Beijing", "zh": "IEM 北京 2026", "short": "IEM 北京",
-     "tag": "next", "tier": "S-Tier", "match": "Beijing"},
-    {"page": "Thunderpick/World_Championship/2026", "zh": "Thunderpick 世界冠军赛 2026", "short": "TWC 2026",
-     "tag": "next", "tier": "A-Tier", "match": "Thunderpick"},
+# ---------------------------------------------------------------------------
+# 赛事清单「自动全体」改造（2026-10-13）
+#
+# 旧版 CONFIG 写死：每来一个新赛事（如 TWC 2026）就得手动往里加，漏加就漏显示。
+# 现在改成【动态生成】：
+#   1) 抓法尔孔战队页（Team_Falcons）的 "Upcoming Tournaments" 板块，直接拿到
+#      法尔孔「将要参加」的全部赛事 Liquipedia 页名（page slug），作为 tag=next
+#      的赛事清单 —— 法尔孔报名就自动收录，零人工维护（核心修复）。
+#   2) 上一轮 event.json 里「正在进行(live)」的赛事也补回来（防它们离开战队页
+#      upcoming 列表后从赛事中心消失，例如正在打的 EPL S24）。
+#   3) 上一轮 event.json 里的「已结束(done)」赛事全部原样保留（赛事中心历史
+#      板块不丢任何一场，形成完整归档）。
+#   4) RECENT_CONFIG：少数不再出现在战队页、但要在历史板块常驻的赛事（手动维护）。
+#   5) SEED_NEXT_CONFIG：战队页抓取失败时的兜底（确保站点不空）。
+# 这样「法尔孔所有比赛」都会被自动收集完整，新赛事零延迟自动上站。
+# ---------------------------------------------------------------------------
+
+# 近期已结束、仍需在历史板块常驻的赛事（战队页已不再列出，手动维护）
+RECENT_CONFIG = [
     {"page": "BLAST/Open/2026/Fall", "zh": "BLAST 公开赛 波尔图站", "short": "BLAST 波尔图",
      "tag": "recent", "tier": "S-Tier", "match": "BLAST"},
     {"page": "Intel Extreme Masters/2026/Cologne/Playoffs", "zh": "IEM 科隆 Major 2026",
      "short": "IEM 科隆", "tag": "recent", "tier": "S-Tier", "match": "Cologne",
      "teams_page": "Intel Extreme Masters/2026/Cologne"},
 ]
+
+# 战队页抓取失败时的兜底清单（与历史已知赛事一致），确保首次/离线也不空站
+SEED_NEXT_CONFIG = [
+    {"page": "ESL/Pro League/Season 24", "zh": "ESL 职业联赛 S24", "short": "EPL S24",
+     "tag": "next", "tier": "S-Tier", "match": "ESL Pro League"},
+    {"page": "Intel Extreme Masters/2026/Beijing", "zh": "IEM 北京 2026", "short": "IEM 北京",
+     "tag": "next", "tier": "S-Tier", "match": "Beijing"},
+    {"page": "Thunderpick/World_Championship/2026", "zh": "Thunderpick 世界冠军赛 2026",
+     "short": "TWC 2026", "tag": "next", "tier": "S-Tier", "match": "Thunderpick"},
+]
+
+# 页名 → 中文显示名（战队页给的是英文缩写；没映射的新赛事回退英文原名，
+# 不影响收录，只是显示英文）
+ZH_MAP = {
+    "ESL/Pro League/Season 24": "ESL 职业联赛 S24",
+    "Intel Extreme Masters/2026/Beijing": "IEM 北京 2026",
+    "Thunderpick/World Championship/2026": "Thunderpick 世界冠军赛 2026",
+    "PGL/2027/Bucharest": "PGL 布加勒斯特 2027",
+    "BLAST/Open/2026/Fall": "BLAST 公开赛 波尔图站",
+    "Intel Extreme Masters/2026/Cologne/Playoffs": "IEM 科隆 Major 2026",
+    "Intel Extreme Masters/2026/Cologne": "IEM 科隆 Major 2026",
+}
+
+# 抓取「未来赛事详情」的视野（天）：超过此天数的未来赛事暂不抓其赛事页
+# （页面多半还是空的，白白触发解析器降级告警）；它们仍会出现在首页未来赛程里，
+# 进入视野后自动开始抓详情。
+HORIZON_DAYS = 45
+
+FALCONS_TEAM = "Team_Falcons"
+FALCONS_TEAM_CACHE = CACHE / "falcons_team.html"
+FALCONS_TEAM_CACHE_MAX_AGE = 30 * 60  # 30 分钟
 
 CONFIG_CACHE = ROOT / "_cache" / "events_cache.json"
 
@@ -468,10 +511,247 @@ def build_event(cfg, html_text, base_info, now):
     }
 
 
+# ===========================================================================
+# 自动全体：从法尔孔战队页动态生成「未来赛事」清单
+# ===========================================================================
+
+_MONTHS = {m: i for i, m in enumerate(
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+
+
+def _page_from_source(source: str) -> str:
+    """从 event.json 的 source URL 还原 Liquipedia 页名（带空格）。"""
+    if not source:
+        return ""
+    marker = "/counterstrike/"
+    if marker not in source:
+        return ""
+    return urllib.parse.unquote(source.split(marker, 1)[1]).strip("/")
+
+
+def parse_date_window(date_text: str, now):
+    """把战队页日期区间（'Oct 14–18' / 'Dec 28–Jan 03'）转成 (start_iso, end_iso)。
+
+    年份规则：月份/日 不低于今天 → 今年；否则明年（处理跨年赛事）。
+    解析不出返回 (None, None)。
+    """
+    if not date_text:
+        return None, None
+    txt = date_text.replace("–", "-").replace("—", "-").strip()
+    parts = re.split(r"\s*-\s*", txt)
+    m1 = re.match(r"([A-Za-z]{3})\.?\s*(\d{1,2})", (parts[0] or "").strip())
+    if not m1:
+        return None, None
+    mo1, d1 = _MONTHS.get(m1.group(1).title()), int(m1.group(2))
+    if not mo1:
+        return None, None
+    if len(parts) > 1:
+        p2 = parts[1].strip()
+        m2 = re.match(r"([A-Za-z]{3})\.?\s*(\d{1,2})", p2)
+        if m2 and re.match(r"[A-Za-z]{3}", p2):
+            # "Mon Day" 或 "Mon DD"（跨月/跨年）
+            mo2, d2 = _MONTHS.get(m2.group(1).title()), int(m2.group(2))
+        else:
+            # 仅日（同日份），如 "Oct 14-18" 的 "18"
+            d2 = int(re.sub(r"\D", "", p2) or d1)
+            mo2 = mo1
+    else:
+        mo2, d2 = mo1, d1
+    y1 = now.year if (mo1, d1) >= (now.month, now.day) else now.year + 1
+    y2 = y1 if (mo2, d2) >= (mo1, d1) else y1 + 1
+    try:
+        start = dt.datetime(y1, mo1, d1, 0, 0, 0, tzinfo=dt.timezone.utc)
+        end = dt.datetime(y2, mo2, d2, 23, 59, 59, tzinfo=dt.timezone.utc)
+    except ValueError:
+        return None, None
+    return start.isoformat(timespec="seconds"), end.isoformat(timespec="seconds")
+
+
+def parse_falcons_upcoming(html: str):
+    """从战队页 HTML 解析 'Upcoming Tournaments' 列表。
+
+    返回 [{page, name, short, tier, date_text, start, end}]。
+    page 直接取自 <a title="...">（已是带空格的 Liquipedia 页名，如
+    'Thunderpick/World Championship/2026'），fetch_page 可直接用。
+    """
+    out = []
+    i = html.find("Upcoming Tournaments")
+    if i < 0:
+        return out
+    seg = html[i:i + 20000]
+    for m in re.finditer(
+            r'<div class="tournaments-list-item">(.*?)(?=<div class="tournaments-list-item">|$)',
+            seg, re.S):
+        b = unescape(m.group(1))
+        nm = re.search(
+            r'tournaments-list-item__name"><a[^>]*title="([^"]+)"[^>]*>([^<]*)</a>', b)
+        if not nm:
+            continue
+        page = nm.group(1).strip()
+        name = nm.group(2).strip() or page
+        date = re.search(r'tournaments-list-item__date">(.*?)</div>', b, re.S)
+        tier = re.search(r'tournament-badge__text">(.*?)</', b, re.S)
+        date_text = unescape(date.group(1)).strip() if date else ""
+        tier_v = tier.group(1).strip() if tier else ""
+        # 兜底：title 缺失时用 href 还原页名
+        if not page or "/" not in page:
+            lk = re.search(r'href="(/counterstrike/[^"]+)"', b)
+            if lk:
+                page = (unescape(lk.group(1)).split("/counterstrike/", 1)[1]
+                        .replace("_", " ").strip("/"))
+        if not page:
+            continue
+        out.append({
+            "page": page, "name": name, "short": name, "tier": tier_v,
+            "date_text": date_text, "start": "", "end": "",
+        })
+    return out
+
+
+def load_falcons_upcoming(allow_net: bool):
+    """读缓存或联网抓战队页，返回 parse_falcons_upcoming 的结果（可能为空）。"""
+    if FALCONS_TEAM_CACHE.exists() and FALCONS_TEAM_CACHE.stat().st_size > 2000:
+        age = time.time() - FALCONS_TEAM_CACHE.stat().st_mtime
+        if age < FALCONS_TEAM_CACHE_MAX_AGE:
+            return parse_falcons_upcoming(
+                FALCONS_TEAM_CACHE.read_text(encoding="utf-8"))
+    if not allow_net:
+        if FALCONS_TEAM_CACHE.exists() and FALCONS_TEAM_CACHE.stat().st_size > 2000:
+            return parse_falcons_upcoming(
+                FALCONS_TEAM_CACHE.read_text(encoding="utf-8"))
+        return []
+    try:
+        h = fetch_page(FALCONS_TEAM)
+        FALCONS_TEAM_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        FALCONS_TEAM_CACHE.write_text(h, encoding="utf-8")
+        return parse_falcons_upcoming(h)
+    except Exception as e:                      # noqa: BLE001
+        print(f"[warn] 战队页抓取失败（{type(e).__name__}: {e}），尝试旧缓存")
+        if FALCONS_TEAM_CACHE.exists() and FALCONS_TEAM_CACHE.stat().st_size > 2000:
+            return parse_falcons_upcoming(
+                FALCONS_TEAM_CACHE.read_text(encoding="utf-8"))
+        return []
+
+
+def derive_upcoming_list():
+    """供 data.json["upcoming_tournaments"] 使用：战队页全部未来赛事（不过滤视野）。
+
+    每个含 page/zh/short/tier/start/end/date_text/url，首页未来赛程直接消费。
+    """
+    now = dt.datetime.now(dt.timezone.utc)
+    raw = load_falcons_upcoming(True)
+    out, seen = [], set()
+    for t in raw:
+        sid = slug(t["page"])
+        if sid in seen:
+            continue
+        seen.add(sid)
+        s, e = parse_date_window(t["date_text"], now)
+        out.append({
+            "name": t["name"],
+            "short": ZH_MAP.get(t["page"]) or t["short"],
+            "zh": ZH_MAP.get(t["page"]) or t["name"],
+            "page": t["page"],
+            "tier": t["tier"],
+            "date_text": t["date_text"],
+            "start": s or "",
+            "end": e or "",
+            "status": "opponent_tbd",
+            "url": "https://liquipedia.net/counterstrike/" + urllib.parse.quote(t["page"]),
+        })
+    return out
+
+
+def _recompute_status(ev, now):
+    """用 start/end 重算状态（upcoming/live/done），用于复用旧数据时不出现永久 live。"""
+    s, e = ev.get("start"), ev.get("end")
+    if not s:
+        return ev
+    try:
+        st = dt.datetime.fromisoformat(s)
+        en = dt.datetime.fromisoformat(e) if e else st + dt.timedelta(days=7)
+    except Exception:                      # noqa: BLE001
+        return ev
+    if now < st:
+        ev["status"] = "upcoming"
+    elif now <= en:
+        ev["status"] = "live"
+    else:
+        ev["status"] = "done"
+    return ev
+
+
+def build_config(old_events):
+    """生成本轮要抓的赛事清单（自动全体）。
+
+    - 动态未来赛事：战队页 upcoming（带视野过滤，太远的暂不抓详情）。
+    - 复活 live：上一轮 event.json 中 status=live 的（防离开 upcoming 后消失）。
+    - 近期常驻：RECENT_CONFIG。
+    - 兜底：动态为空时用 SEED_NEXT_CONFIG。
+    （done 赛事不进抓取清单，由 main() 末尾统一「携带历史归档」补回。）
+    """
+    now = dt.datetime.now(dt.timezone.utc)
+    cfg, seen = [], set()
+
+    def add(c, base=None):
+        sid = slug(c["page"])
+        if sid in seen:
+            return
+        seen.add(sid)
+        if base is not None:
+            c = dict(c)
+            c["_base"] = base
+        cfg.append(c)
+
+    # 1) 动态未来赛事（战队页 upcoming），超出视野的暂不抓详情
+    for t in load_falcons_upcoming(True):
+        s, e = parse_date_window(t["date_text"], now)
+        if s:
+            try:
+                if (dt.datetime.fromisoformat(s) - now).days > HORIZON_DAYS:
+                    print(f"[视野外] {t['name']} 开赛 {s[:10]}，超过 {HORIZON_DAYS} 天视野，"
+                          f"暂不抓详情（首页赛程仍显示）")
+                    continue
+            except Exception:                      # noqa: BLE001
+                pass
+        base = {"start": s or "", "end": e or "", "date_text": t["date_text"],
+                "tier": t["tier"] or "Unknown", "note": ""}
+        add({"page": t["page"], "zh": ZH_MAP.get(t["page"], t["name"]),
+             "short": ZH_MAP.get(t["page"], t["short"]), "tag": "next",
+             "tier": t["tier"] or "Unknown", "match": t["name"]}, base)
+
+    # 2) 复活 live：上一轮 event.json 里正在进行、但可能已离开战队页 upcoming
+    for ev in old_events:
+        if ev.get("status") != "live":
+            continue
+        page = _page_from_source(ev.get("source", ""))
+        if not page:
+            continue
+        add({"page": page, "zh": ev.get("name", page),
+             "short": ev.get("short", ev.get("name", page)), "tag": "next",
+             "tier": ev.get("tier", "Unknown"), "match": ev.get("name", "")},
+            {"start": ev.get("start", ""), "end": ev.get("end", ""),
+             "date_text": ev.get("date_text", ""), "tier": ev.get("tier", ""),
+             "note": ev.get("note", "")})
+
+    # 3) 兜底：动态为空 → SEED
+    if not [c for c in cfg if c["tag"] == "next"]:
+        print("[warn] 战队页未取到未来赛事，使用 SEED 兜底清单")
+        for c in SEED_NEXT_CONFIG:
+            add(c)
+
+    # 4) 近期常驻
+    for c in RECENT_CONFIG:
+        add(c)
+
+    return cfg
+
+
 def main():
     allow_net = "--offline" not in sys.argv
-    # 快速刷新模式：只重抓「还没结束」的赛事，已结束赛事内容已定型，保留旧数据即可。
-    # 这样定时快刷（每 5 分钟）只花 1~2 个页面的配额，不会被 Liquipedia 限流拖成十几分钟。
+    # 快速刷新模式（--live-only）：只重抓「进行中 + 3 天内开赛」的赛事，更远未来
+    # 留给 6 小时全量跑；已结束赛事永远复用旧数据（分数不会再变，省配额）。
     live_only = "--live-only" in sys.argv
     now = dt.datetime.now(dt.timezone.utc)
     base = {}
@@ -483,45 +763,69 @@ def main():
     except Exception as e:
         print("读取 data.json 失败:", e)
 
-    # 旧数据快照：改版自检失效时逐赛事回补，避免板块变空白
+    # 旧数据快照：用于「已结束赛事复用旧数据」「携带历史归档」「复活进行中赛事」
+    old_events = []
     old_by_id = {}
     known_status = {}
     try:
-        for _e in json.loads(OUT_JSON.read_text(encoding="utf-8")).get("events") or []:
+        old = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+        old_events = old.get("events") or []
+        for _e in old_events:
             if _e.get("id"):
                 old_by_id[_e["id"]] = _e
                 known_status[_e["id"]] = _e.get("status")
     except Exception:
         pass
 
+    # 自动全体：动态生成赛事清单（战队页 upcoming + 复活 live + 近期常驻 + SEED 兜底）
+    CONFIG = build_config(old_events)
+
     events = []
+    used_ids = set()
     degraded = []
     fetched = 0
-    for i, cfg in enumerate(CONFIG):
-        # 快刷模式跳过已结束赛事（内容已定型），但要把旧数据保留下来，
-        # 否则它们会从 event.json 里消失，赛事中心的历史板块就不见了。
-        if live_only and known_status.get(slug(cfg["page"])) == "done":
-            _old = old_by_id.get(slug(cfg["page"]))
+    LIVE_ONLY_HORIZON = dt.timedelta(days=3)
+
+    for idx, cfg in enumerate(CONFIG):
+        sid = slug(cfg["page"])
+        # 已结束 → 直接复用旧数据；快刷模式下更远未来 → 也复用旧数据
+        skip_fetch = (known_status.get(sid) == "done")
+        if live_only and not skip_fetch:
+            s = (cfg.get("_base") or {}).get("start") or ""
+            try:
+                if s and (dt.datetime.fromisoformat(s) - now) > LIVE_ONLY_HORIZON:
+                    skip_fetch = True
+            except Exception:                      # noqa: BLE001
+                pass
+        if skip_fetch:
+            _old = old_by_id.get(sid)
             if _old:
-                events.append(_old)
-                print(f"[快刷跳过] {cfg['zh']}（已结束，保留旧数据）")
+                ev = _recompute_status(dict(_old), now)
+                if ev["status"] == "done":
+                    ev["tag"] = "recent"
+                events.append(ev)
+                used_ids.add(sid)
+                print(f"[复用] {cfg['zh']}（{ev['status']}，复用旧数据）")
             continue
+
         html, src = load_html(cfg["page"], allow_net)
         if not html:
             print(f"[跳过] {cfg['zh']} — 无缓存且未联网")
             continue
         fetched += 1
-        if src == "net" and i + 1 < len(CONFIG):
+        # 限流：仅在「真实联网抓取」的页面之间等 32s（缓存命中等不耗配额）
+        if src == "net" and idx + 1 < len(CONFIG):
             time.sleep(32)
-        # 匹配基础赛程信息
-        info = None
-        for k, v in base.items():
-            if cfg["match"] and cfg["match"].lower() in (k or "").lower():
-                info = v
-                break
-            if cfg["short"] and cfg["short"].lower() in (k or "").lower():
-                info = v
-                break
+
+        info = cfg.get("_base")
+        if not info:
+            for k, v in base.items():
+                if cfg.get("match") and cfg["match"].lower() in (k or "").lower():
+                    info = v
+                    break
+                if cfg.get("short") and cfg["short"].lower() in (k or "").lower():
+                    info = v
+                    break
         try:
             ev = build_event(cfg, html, info, now)
         except Exception as e:
@@ -536,30 +840,46 @@ def main():
             if old_alive:
                 ev_old["parse_warning"] = warns
                 events.append(ev_old)
+                used_ids.add(ev["id"])
                 degraded.append(ev["id"])
                 print(f"[PARSE-DEGRADED] {ev['name']}: {'; '.join(warns)}；"
                       f"已保留旧版数据（updated={ev_old.get('updated', '?')}）")
                 continue
             events.append(ev)
+            used_ids.add(ev["id"])
             degraded.append(ev["id"])
             print(f"[PARSE-WARN] {ev['name']}: {'; '.join(warns)}；无旧数据可回补")
             continue
         events.append(ev)
+        used_ids.add(ev["id"])
         n_teams = len(ev["teams"])
         n_br = sum(len(rd["matches"]) for b in ev["brackets"] for rd in b["rounds"])
         print(f"[ok:{src}] {ev['name']:22} 状态={ev['status']:8} 队={n_teams:3} "
               f"分支={len(ev['brackets'])}({n_br}场) 分组={len(ev['groups'])} 赛程={len(ev['schedule'])}")
 
-    # 快刷模式下如果一场都没真抓（全是已结束赛事），就不要覆写文件——
-    # 否则只刷时间戳、内容没变，既误导页面上「最后更新于」，也白占一次提交。
-    if live_only and not fetched:
-        print("快刷模式：无活跃赛事需重抓，已跳过写入 event.json")
+    # 完整性兜底：把上一轮 event.json 里「本轮没抓到」的赛事原样补回，
+    # 保证赛事中心永不丢赛事（进行中转正、已结束归档都保留，形成完整全体）。
+    for e in old_events:
+        sid = e.get("id")
+        if not sid or sid in used_ids:
+            continue
+        ev = _recompute_status(dict(e), now)
+        if ev["status"] == "done":
+            ev["tag"] = "recent"
+        events.append(ev)
+        used_ids.add(sid)
+        print(f"[携带] {ev.get('name', sid)}（{ev['status']}，历史归档复用）")
+
+    # 本轮无联网抓取且无新增赛事 → 跳过写出，避免空提交（只在全为已结束赛事的休赛期发生）
+    if fetched == 0 and not degraded:
+        print("本轮无联网抓取且无变化，跳过写出 event.json（避免空提交）")
         return
 
-    events.sort(key=lambda e: (0 if e["tag"] == "next" else 1, e["start"] or "9999"))
+    # 排序：next 在前、按开赛时间；recent 在后
+    events.sort(key=lambda e: (0 if e.get("tag") == "next" else 1, e.get("start") or "9999"))
     data = {
         "updated": now.isoformat(timespec="seconds"),
-        "featured": next((e for e in events if e["tag"] == "next"), None),
+        "featured": next((e for e in events if e.get("tag") == "next"), None),
         "events": events,
         "source_note": "赛事分组、分支图与赛程抓取自 Liquipedia（CC BY-SA 3.0）。",
     }

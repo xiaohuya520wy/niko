@@ -258,6 +258,20 @@ def main():
 
     out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    # 自动全体：用战队页 upcoming 刷新首页未来赛程（data.json.upcoming_tournaments），
+    # 与 event.json 同源，保证「法尔孔所有比赛」在两处都自动收录、不再手抄。
+    try:
+        import fetch_event as _fe
+        up = _fe.derive_upcoming_list()
+        if up:
+            cur = json.loads(out.read_text(encoding="utf-8"))
+            cur["upcoming_tournaments"] = up
+            cur["meta"]["updated"] = data["meta"]["updated"]
+            out.write_text(json.dumps(cur, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"[OK] 刷新 upcoming_tournaments：{len(up)} 个（来自战队页）")
+    except Exception as e:                      # noqa: BLE001
+        print(f"[warn] 刷新 upcoming_tournaments 失败：{e}", file=sys.stderr)
+
     st = data["year_stats"]
     with_maps = sum(1 for m in matches if m.get("maps"))
     print(f"OK matches={st['matches']} {st['wins']}W-{st['losses']}L "
