@@ -272,6 +272,19 @@ def main():
     except Exception as e:                      # noqa: BLE001
         print(f"[warn] 刷新 upcoming_tournaments 失败：{e}", file=sys.stderr)
 
+    # 自动刷新选手基础信息（生涯奖金 / 年龄 / 状态等）来自 Liquipedia 球员页，
+    # 替代 base.json 里会过期的手写值；抓不到就保留旧值，不会报错、不会覆盖。
+    try:
+        import fetch_player as _fp
+        time.sleep(31)                          # 与前方赛事页抓取错开限流窗口
+        cur = json.loads(out.read_text(encoding="utf-8"))
+        if _fp.refresh(cur["player"]):
+            cur["meta"]["updated"] = data["meta"]["updated"]
+            out.write_text(json.dumps(cur, ensure_ascii=False, indent=2), encoding="utf-8")
+            print("[OK] 刷新 player 基础信息（来自 Liquipedia 球员页）")
+    except Exception as e:                      # noqa: BLE001
+        print(f"[warn] 刷新 player 失败：{e}", file=sys.stderr)
+
     st = data["year_stats"]
     with_maps = sum(1 for m in matches if m.get("maps"))
     print(f"OK matches={st['matches']} {st['wins']}W-{st['losses']}L "

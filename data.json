@@ -37,7 +37,7 @@
     "born": "1997 年 2 月 16 日",
     "years_active": "2009 年至今",
     "status": "现役",
-    "winnings": "$2,011,746",
+    "winnings": "$2,013,746",
     "role_liq": "突破位",
     "gear": {
       "mouse": "Razer DeathAdder V3 Pro",
@@ -71,22 +71,40 @@
   "next_match": null,
   "upcoming_tournaments": [
     {
-      "short": "EPL S24",
-      "date_text": "10/03–11",
-      "start": "2026-10-03T09:00:00Z",
-      "end": "2026-10-11T23:59:59Z",
-      "name": "ESL Pro League Season 24",
+      "name": "Thunderpick World Champ. '26",
+      "short": "Thunderpick 世界冠军赛 2026",
+      "zh": "Thunderpick 世界冠军赛 2026",
+      "page": "Thunderpick/World Championship/2026",
       "tier": "S-Tier",
-      "note": ""
+      "date_text": "Oct 14–18",
+      "start": "2026-10-14T00:00:00+00:00",
+      "end": "2026-10-18T23:59:59+00:00",
+      "status": "opponent_tbd",
+      "url": "https://liquipedia.net/counterstrike/Thunderpick/World%20Championship/2026"
     },
     {
-      "short": "IEM 北京",
-      "date_text": "11/02–08",
-      "start": "2026-11-02T10:00:00Z",
-      "end": "2026-11-08T23:59:59Z",
-      "name": "IEM 北京 2026",
+      "name": "IEM Beijing 2026",
+      "short": "IEM 北京 2026",
+      "zh": "IEM 北京 2026",
+      "page": "Intel Extreme Masters/2026/Beijing",
       "tier": "S-Tier",
-      "note": "奖金 125 万美元"
+      "date_text": "Nov 02–08",
+      "start": "2026-11-02T00:00:00+00:00",
+      "end": "2026-11-08T23:59:59+00:00",
+      "status": "opponent_tbd",
+      "url": "https://liquipedia.net/counterstrike/Intel%20Extreme%20Masters/2026/Beijing"
+    },
+    {
+      "name": "PGL Bucharest 2027",
+      "short": "PGL 布加勒斯特 2027",
+      "zh": "PGL 布加勒斯特 2027",
+      "page": "PGL/2027/Bucharest",
+      "tier": "S-Tier",
+      "date_text": "Jan 17–24",
+      "start": "2027-01-17T00:00:00+00:00",
+      "end": "2027-01-24T23:59:59+00:00",
+      "status": "opponent_tbd",
+      "url": "https://liquipedia.net/counterstrike/PGL/2027/Bucharest"
     }
   ],
   "meta": {
@@ -102,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-13T06:33:55+00:00"
+    "updated": "2026-10-13T08:00:19+00:00"
   },
   "squad": [
     {
@@ -370,102 +388,19 @@
   ],
   "recent_matches": [
     {
-      "id": "2026-10-14-ninjas-in-pyjamas",
-      "date": "2026-10-14T11:00:00Z",
-      "opponent": "Ninjas in Pyjamas",
-      "score": "0-0",
-      "result": "L",
-      "bo": "Bo3",
-      "event": "2026",
-      "stage": "",
-      "maps": [],
-      "links": {
-        "hltv_match": "https://www.hltv.org/matches/2399385/match",
-        "vods": [],
-        "hltv_maps": []
-      },
-      "niko": {
-        "ratings": []
-      }
-    },
-    {
       "id": "2026-10-09-spirit",
-      "date": "2026-10-09T17:05:00Z",
+      "date": "2026-10-09T16:00:00Z",
       "opponent": "Spirit",
-      "score": "0-2",
+      "score": "0-0",
       "result": "L",
       "bo": "Bo3",
       "event": "Season 24",
       "stage": "",
-      "maps": [
-        {
-          "map": "Mirage",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "8",
-            "t": "5",
-            "ct": "3"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "9",
-            "ct": "4"
-          }
-        },
-        {
-          "map": "Anubis",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "10",
-            "t": "5",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "7",
-            "ct": "6"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": true,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          },
-          "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          }
-        }
-      ],
+      "maps": [],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2398753/match",
-        "vods": [
-          {
-            "game": 1,
-            "url": "https://youtu.be/LuW2Lg4PA7k&t=25"
-          },
-          {
-            "game": 2,
-            "url": "https://youtu.be/LuW2Lg4PA7k&t=3055"
-          }
-        ],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241229"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241241"
-          }
-        ]
+        "vods": [],
+        "hltv_maps": []
       },
       "niko": {
         "ratings": []
@@ -6204,11 +6139,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-10-14",
-    "matches": 64,
+    "to": "2026-10-09",
+    "matches": 63,
     "wins": 44,
-    "losses": 20,
-    "win_rate": 68.8,
-    "events": 16
+    "losses": 19,
+    "win_rate": 69.8,
+    "events": 15
   }
 }
