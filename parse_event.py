@@ -610,8 +610,10 @@ def parse_health(h: str, d: dict):
     def _real_teams(seg):
         return set(re.findall(r'<a href="/counterstrike/[^"]+" title="(?!TBD)([^"]+)"', seg))
 
-    # 1. 积分表存在但分组为空
-    if not (d.get("groups") or []):
+    # 1. 积分表存在但核心赛程数据全空（groups/brackets/schedule 都为空）
+    #    才判定解析器被改版打挂；只要任一项有真实数据即视为正常解析。
+    #    （修正：TWC 2026 等赛制其赛程在 schedule 而非 groups，不应误报）
+    if not (d.get("groups") or d.get("brackets") or d.get("schedule")):
         for m in re.finditer(r'<table class="[^"]*wikitable[^"]*"[^>]*>(.*?)</table>', h, re.S):
             if len(_real_teams(m.group(1))) >= 4:
                 warns.append("page has a standings-like wikitable but groups=0")

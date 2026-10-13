@@ -87,6 +87,14 @@
       "name": "IEM 北京 2026",
       "tier": "S-Tier",
       "note": "奖金 125 万美元"
+    },
+    {
+      "short": "TWC 2026",
+      "name": "Thunderpick 世界冠军赛 2026",
+      "start": "2026-10-14T08:30:00Z",
+      "end": "2026-10-18T23:59:59Z",
+      "date_text": "10/14–18",
+      "tier": "A-Tier"
     }
   ],
   "meta": {
@@ -102,7 +110,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-13T00:56:12+00:00"
+    "updated": "2026-10-09T13:22:50+00:00"
   },
   "squad": [
     {
@@ -371,82 +379,18 @@
   "recent_matches": [
     {
       "id": "2026-10-09-spirit",
-      "date": "2026-10-09T17:05:00Z",
+      "date": "2026-10-09T16:00:00Z",
       "opponent": "Spirit",
-      "score": "0-2",
+      "score": "0-0",
       "result": "L",
       "bo": "Bo3",
       "event": "Season 24",
       "stage": "",
-      "maps": [
-        {
-          "map": "Mirage",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "8",
-            "t": "5",
-            "ct": "3"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "9",
-            "ct": "4"
-          }
-        },
-        {
-          "map": "Anubis",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "10",
-            "t": "5",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "7",
-            "ct": "6"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": true,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          },
-          "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          }
-        }
-      ],
+      "maps": [],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2398753/match",
-        "vods": [
-          {
-            "game": 1,
-            "url": "https://youtu.be/LuW2Lg4PA7k&t=25"
-          },
-          {
-            "game": 2,
-            "url": "https://youtu.be/LuW2Lg4PA7k&t=3055"
-          }
-        ],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241229"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241241"
-          }
-        ]
+        "vods": [],
+        "hltv_maps": []
       },
       "niko": {
         "ratings": []

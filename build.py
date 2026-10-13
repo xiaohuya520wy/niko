@@ -1837,7 +1837,7 @@ function render(){
       <div class="hero-sub">${esc(d.next_match.event)} · ${boText(d.next_match.bo)}</div>`;
   }else if((d.upcoming_tournaments||[]).length){
     // 跳过「已开打但法尔孔已被淘汰（无下一场）」的当前赛事，直接展示下一个预告赛事
-    const U = d.upcoming_tournaments;
+    const U = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
     let ti = -1;
     for(let i = 0; i < U.length; i++){
       const t0 = Date.parse(U[i].start);
@@ -1860,7 +1860,7 @@ function render(){
       <div class="hero-sub">暂时没有已公布的比赛</div>`;
   }
 
-  const Uall = (d.upcoming_tournaments||[]);
+  const Uall = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
   // 与 hero 保持一致：跳过「已开打且法尔孔已淘汰」的当前赛事
   const Ushown = Uall.filter(t => {
     const t0 = Date.parse(t.start);

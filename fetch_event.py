@@ -37,6 +37,8 @@ CONFIG = [
      "tag": "next", "tier": "S-Tier", "match": "ESL Pro League"},
     {"page": "Intel Extreme Masters/2026/Beijing", "zh": "IEM 北京 2026", "short": "IEM 北京",
      "tag": "next", "tier": "S-Tier", "match": "Beijing"},
+    {"page": "Thunderpick/World_Championship/2026", "zh": "Thunderpick 世界冠军赛 2026", "short": "TWC 2026",
+     "tag": "next", "tier": "A-Tier", "match": "Thunderpick"},
     {"page": "BLAST/Open/2026/Fall", "zh": "BLAST 公开赛 波尔图站", "short": "BLAST 波尔图",
      "tag": "recent", "tier": "S-Tier", "match": "BLAST"},
     {"page": "Intel Extreme Masters/2026/Cologne/Playoffs", "zh": "IEM 科隆 Major 2026",
