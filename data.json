@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-14T12:24:15+00:00"
+    "updated": "2026-10-14T13:05:19+00:00"
   },
   "squad": [
     {
@@ -389,14 +389,60 @@
   "recent_matches": [
     {
       "id": "2026-10-14-ninjas-in-pyjamas",
-      "date": "2026-10-14T12:15:00Z",
+      "date": "2026-10-14T12:20:00Z",
       "opponent": "Ninjas in Pyjamas",
       "score": "0-0",
       "result": "L",
       "bo": "Bo3",
       "event": "2026",
       "stage": "",
-      "maps": [],
+      "maps": [
+        {
+          "map": "Ancient",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        },
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399385/match",
         "vods": [],
