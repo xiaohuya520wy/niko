@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-14T13:05:19+00:00"
+    "updated": "2026-10-14T18:12:15+00:00"
   },
   "squad": [
     {
@@ -388,11 +388,30 @@
   ],
   "recent_matches": [
     {
+      "id": "2026-10-15-9z-team",
+      "date": "2026-10-15T11:00:00Z",
+      "opponent": "9z Team",
+      "score": "0-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "2026",
+      "stage": "",
+      "maps": [],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2399409/match",
+        "vods": [],
+        "hltv_maps": []
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
+    {
       "id": "2026-10-14-ninjas-in-pyjamas",
       "date": "2026-10-14T12:20:00Z",
       "opponent": "Ninjas in Pyjamas",
-      "score": "0-0",
-      "result": "L",
+      "score": "2-0",
+      "result": "W",
       "bo": "Bo3",
       "event": "2026",
       "stage": "",
@@ -400,36 +419,36 @@
         {
           "map": "Ancient",
           "vetoed": false,
-          "falcons_win": false,
+          "falcons_win": true,
           "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "16",
+            "t": "4",
+            "ct": "8"
           },
           "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "13",
+            "t": "4",
+            "ct": "8"
           }
         },
         {
           "map": "Dust II",
           "vetoed": false,
-          "falcons_win": false,
+          "falcons_win": true,
           "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "13",
+            "t": "8",
+            "ct": "5"
           },
           "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "6",
+            "t": "2",
+            "ct": "4"
           }
         },
         {
           "map": "Mirage",
-          "vetoed": false,
+          "vetoed": true,
           "falcons_win": false,
           "falcons": {
             "rounds": "",
@@ -446,7 +465,16 @@
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399385/match",
         "vods": [],
-        "hltv_maps": []
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=241633"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=241645"
+          }
+        ]
       },
       "niko": {
         "ratings": []
@@ -6268,11 +6296,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-10-14",
-    "matches": 64,
-    "wins": 44,
-    "losses": 20,
-    "win_rate": 68.8,
+    "to": "2026-10-15",
+    "matches": 65,
+    "wins": 46,
+    "losses": 19,
+    "win_rate": 70.8,
     "events": 16
   }
 }
