@@ -1354,6 +1354,21 @@ function isLive(ts){
 }
 function statusCn(s){ return s === 'live' ? '进行中' : s === 'done' ? '已结束' : '即将开始'; }
 function statusCls(s){ return s === 'live' ? 's-live' : s === 'done' ? 's-done' : 's-up'; }
+/* 赛事状态按时间戳实时算（不信赖服务端烤进 JSON 的 status 字符串）。
+   只要 start/end 正确（固定日期，不会过期），无论服务端多久没刷新，
+   浏览器每帧都能给出对的『进行中 / 即将开始 / 已结束』——彻底杜绝
+   “已经开打却显示即将开始”这类因 JSON 暂未刷新导致的展示错误。
+   赛事中心、赛事详情、首页赛事卡全部走这个函数。 */
+function liveStatus(start, end){
+  if(!start) return 'upcoming';
+  const now = Date.now() / 1000;
+  const s = Date.parse(start) / 1000;
+  if(!Number.isFinite(s)) return 'upcoming';
+  const e = end ? Date.parse(end) / 1000 : s + 7 * 86400;
+  if(now < s) return 'upcoming';
+  if(now <= e) return 'live';
+  return 'done';
+}
 function brkCount(e){ return (e.brackets || []).reduce((a, b) => a + (b.count || 0), 0); }
 /* 场次开赛时间戳：优先 m.ts；小组赛（brackets/matchlist）的 m.ts 常为 null，
    但稳定 id 形如 `...__{slug}__{unix_ts}`，末段就是开赛时间，用它兜底
@@ -1543,7 +1558,7 @@ function evEntry(){
     const more = all.length > 8 ? `<span class="ev-e-more">+${all.length - 8}</span>` : '';
     return `<a class="ev-e" href="event.html?id=${encodeURIComponent(e.id)}">
       <div class="ev-e-h"><b>${esc(e.short || e.name)}</b>
-        <span class="ev-b ${statusCls(e.status)}">${statusCn(e.status)}</span></div>
+        <span class="ev-b ${statusCls(liveStatus(e.start, e.end))}">${statusCn(liveStatus(e.start, e.end))}</span></div>
       <div class="ev-e-m">${esc(e.name)}</div>
       <div class="ev-e-d">${esc(e.date_text || '')} · ${esc(tierText(e.tier))}${e.prize ? ' · ' + esc(e.prize) : ''}</div>
       ${lg ? `<div class="ev-e-lg">${lg}${more}</div>` : ''}
@@ -2446,7 +2461,12 @@ function render(){
   <div class="foot">阵容与选手资料抓取自 Liquipedia（CC BY-SA 3.0）。最近更新：__UPDATED__</div>`;
 }
 
-async function boot(){ render(); sync(document.getElementById('liveStatus')); }
+async function boot(){
+  render();
+  const st = document.getElementById('liveStatus');
+  sync(st);
+  setInterval(() => sync(st), 60000);   // 阵容页也每 60 秒同步远端数据（与首页/赛事页一致），避免打开后一直停在旧快照
+}
 """
 
 PLAYER_JS = CORE_JS + r"""
@@ -2637,7 +2657,9 @@ function render(){
 async function boot(){
   await Promise.all([pullPhotos(), pullNewest()]);
   render();
-  sync(document.getElementById('liveStatus'));
+  const st = document.getElementById('liveStatus');
+  sync(st);
+  setInterval(() => sync(st), 60000);   // 选手页也每 60 秒同步远端数据（与首页/赛事页一致），避免打开后一直停在旧快照
 }
 """
 
@@ -2671,7 +2693,7 @@ function evCard(e){
     ['奖池', e.prize || '—'],
     ['参赛队伍', (e.teams || []).length ? (e.teams.length + ' 支') : '待公布']
   ].map(([k, v]) => `<div class="ev-mi"><span>${k}</span><b>${esc(v)}</b></div>`).join('');
-  const cd = (e.status === 'upcoming' && e.start) ? `<div class="ev-count" id="evCount">
+  const cd = (liveStatus(e.start, e.end) === 'upcoming' && e.start) ? `<div class="ev-count" id="evCount">
       <div class="ev-cd"><b id="cdD">–</b><span>天</span></div>
       <div class="ev-cd"><b id="cdH">–</b><span>小时</span></div>
       <div class="ev-cd"><b id="cdM">–</b><span>分钟</span></div>
@@ -2682,7 +2704,7 @@ function evCard(e){
       <div class="ev-name">${esc(e.name)}</div>
       <div class="ev-badge">
         <span class="ev-b gold">${esc(tierText(e.tier) || 'S 级')}</span>
-        <span class="ev-b ${statusCls(e.status)}">${statusCn(e.status)}</span>
+        <span class="ev-b ${statusCls(liveStatus(e.start, e.end))}">${statusCn(liveStatus(e.start, e.end))}</span>
       </div>
     </div>
     <div class="ev-meta">${meta}</div>
@@ -2810,7 +2832,7 @@ function bracketsSec(e){
   const bs = (e.brackets || []).filter(b => b.count);
   if(!bs.length) return `<div class="sec">
     <div class="sec-h"><b>分支图</b><i></i><em>对阵树</em></div>
-    <div class="empty">${(e.status === 'upcoming')
+    <div class="empty">${(liveStatus(e.start, e.end) === 'upcoming')
       ? '淘汰赛阶段开始后，分支图将自动出现并每 60 秒同步'
       : '分组与对阵尚未公布'}<br>数据来自 Liquipedia（CC BY-SA 3.0）</div>
     </div>`;
@@ -2929,7 +2951,7 @@ function render(){
       window.scrollTo({top: 0, behavior: 'smooth'});
     });
   });
-  if(e.status === 'upcoming' && e.start) startCountdown(e.start);
+  if(liveStatus(e.start, e.end) === 'upcoming' && e.start) startCountdown(e.start);
   // 分支图自适应：等布局算出真实列宽后再写 --cw（requestAnimationFrame 保证已 reflow）
   requestAnimationFrame(fitBrackets);
 }

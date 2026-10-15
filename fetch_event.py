@@ -657,7 +657,7 @@ def derive_upcoming_list():
             "date_text": t["date_text"],
             "start": s or "",
             "end": e or "",
-            "status": "opponent_tbd",
+            "status": _up_status(s, e, now),
             "url": "https://liquipedia.net/counterstrike/" + urllib.parse.quote(t["page"]),
         })
     return out
@@ -680,6 +680,25 @@ def _recompute_status(ev, now):
     else:
         ev["status"] = "done"
     return ev
+
+
+def _up_status(s, e, now):
+    """upcoming_tournaments 的状态也按时间戳算，避免写死 opponent_tbd 误导前端。
+
+    前端展示其实已改用 liveStatus() 实时计算，这里只是让服务端 JSON 自洽。
+    """
+    if not s:
+        return "upcoming"
+    try:
+        st = dt.datetime.fromisoformat(s)
+        en = dt.datetime.fromisoformat(e) if e else st + dt.timedelta(days=7)
+    except Exception:                      # noqa: BLE001
+        return "upcoming"
+    if now < st:
+        return "upcoming"
+    if now <= en:
+        return "live"
+    return "done"
 
 
 def build_config(old_events):
