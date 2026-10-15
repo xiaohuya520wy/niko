@@ -466,7 +466,13 @@ def build_event(cfg, html_text, base_info, now):
     seen_ab = {(r["ts"], r["a"], r["b"]) for r in sched}
     for u in d.get("upcoming", []):
         a, b = norm_team(u["a"]["name"]), norm_team(u["b"]["name"])
-        if (u["ts"], a, b) in seen_ab:
+        # 与 sched 里的对阵去重：队名相同且开赛时间接近（±90s）即同一场。
+        # matchlist 的 timer-object ts 与 Upcoming 的 ts 实测差几十秒（如
+        # 1791966000 vs 1791966600），精确相等会漏判，导致同一场在赛程里
+        # 重复出现（一条带实时比分、一条旧快照）。matchlist 版先入 sched，
+        # 这里跳过 Upcoming 版即优先保留实时比分。
+        if any(a == r["a"] and b == r["b"] and abs(u["ts"] - r["ts"]) <= 90
+               for r in sched):
             continue
         seen_ab.add((u["ts"], a, b))
         sched.append({

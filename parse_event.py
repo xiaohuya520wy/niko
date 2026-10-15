@@ -398,8 +398,9 @@ def parse_matchlist(h: str):
     还没定」的页面 brackets=0，第一阶段对阵完全显示不出来。
 
     返回 [ {title, rounds:[{name, matches:[...]}]} ]，结构与 parse_brackets 一致，
-    供 build() 并入 brackets。日期作轮次（列）名；对阵无时间戳（ts=None），
-    不会污染赛程（schedule_from_brackets 会跳过无 ts 的场次）。"""
+    供 build() 并入 brackets。每场带 ts（块内 timer-object 的 data-timestamp）与
+    实时比分：开打后该场会从 Upcoming Matches 消失，matchlist 是唯一数据源，
+    必须能进赛程（schedule_from_brackets 只收有 ts 的场次）。"""
     h = prep(h)
     miter = list(re.finditer(r'<div class="brkts-matchlist-match', h))
     if not miter:
@@ -426,13 +427,18 @@ def parse_matchlist(h: str):
         sc = re.findall(r'brkts-matchlist-score[^>]*>.*?cell-content">([^<]*)', blk, re.S)
         sa = int(sc[0]) if len(sc) > 0 and sc[0].strip().isdigit() else None
         sb = int(sc[1]) if len(sc) > 1 and sc[1].strip().isdigit() else None
+        # 开赛时间戳：matchlist 块内的 timer-object（开打后该场会从 Upcoming Matches
+        # 消失，只有这里有 ts）。没有 ts 的比赛会被 schedule_from_brackets 跳过，
+        # 于是「赛程变空、实时比分全丢」（2026-10-15 用户实测 TWC 进行中无比分）。
+        ts_m = re.search(r'timer-object[^>]*data-timestamp="(\d+)"', blk)
+        ts = int(ts_m.group(1)) if ts_m else None
         wa = wb = False
         if sa is not None and sb is not None and sa != sb:
             wa, wb = sa > sb, sb > sa
         md = {
             "a": {"name": names[0], "full": names[0], "short": "", "score": sa, "win": wa},
             "b": {"name": names[1], "full": names[1], "short": "", "score": sb, "win": wb},
-            "ts": None, "bo": default_bo, "depth": 0,
+            "ts": ts, "bo": default_bo, "depth": 0,
         }
         key = name or "对阵"
         if key not in groups:

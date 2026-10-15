@@ -2217,6 +2217,7 @@ function fromRecent(m){
     b:{name: m.opponent, score: sb, win: m.result==='L'},
     scoreText: m.score||'—',
     bo: m.bo, event: m.event, stage: m.stage, dateText: bj(m.date),
+    ts: m.date ? Date.parse(m.date)/1000 : null,
     maps, links: m.links||{}, niko: m.niko||null, isNiko: true
   };
 }
@@ -2247,6 +2248,7 @@ function evMatchToR(m, ev){
     b:{name: bn, score: bscore, win: bwin},
     scoreText, bo: m.bo, event: ev.name, stage: (m.stage||''),
     dateText: m.ts ? tsToDate(m.ts) : '',
+    ts: m.ts || null,
     maps, links: m.links||{}, niko: null, isNiko: isN
   };
 }
@@ -2284,8 +2286,22 @@ function render(){
   const aLabel = aIsNiko ? d.player.nick : R.a.name;
   const bLabel = bIsNiko ? d.player.nick : R.b.name;
   const nikoWon = R.isNiko ? (aIsNiko ? R.a.win : R.b.win) : null;
-  const outcome = R.a.score==null ? '即将开始'
-    : (R.isNiko ? (nikoWon ? '取胜' : '落败') : '已结束');
+  /* 状态按时间戳实时判定（与 liveStatus 同一思路），不再「无比分=即将开始」：
+     开赛时间已过但无比分 = 进行中（Liquipedia 尚未录分，2026-10-15 用户实测
+     TWC 9z vs Falcons 已开打 1 小时却显示「即将开始」就是这个判断导致的）；
+     有比分且系列赛已分出胜负 = 取胜/落败/已结束；有比分未分胜负 = 进行中。
+     ts 缺失（纯 bracket TBD 项）时退回比分判断。 */
+  const _hasScore = R.a.score != null && R.b.score != null;
+  const _seriesDone = _hasScore && (R.a.win || R.b.win);
+  let outcome;
+  if(R.ts){
+    if(!_hasScore) outcome = Date.now()/1000 < R.ts ? '即将开始' : '进行中';
+    else if(_seriesDone) outcome = R.isNiko ? (nikoWon ? '取胜' : '落败') : '已结束';
+    else outcome = '进行中';
+  } else {
+    outcome = !_hasScore ? '即将开始'
+      : (R.isNiko ? (nikoWon ? '取胜' : '落败') : '已结束');
+  }
 
   const maxRound = Math.max(...played.map(p =>
     Math.max(Number(p.a.rounds)||0, Number(p.b.rounds)||0)), 13);
