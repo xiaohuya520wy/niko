@@ -1444,6 +1444,28 @@ async function pullNewest(){
   if(best){ FRESH = best.d; return best.tag; }
   return null;
 }
+/* 数据内容指纹（对应 eventFingerprint，但针对 data.json）。
+   旧 sync() 只比 meta.updated + upcoming_tournaments + recent_matches.length：
+   当服务端「原地补全某场比分 / 录入胜负」时（长度不变、meta.updated 可能写死），
+   指纹不变 → render() 永不被调用 → 已打完的比赛在页面上停在原地，
+   直到用户关闭重开（__syncSig 被重置为 '' 才强制重画）。
+   这正是「页面不自动刷新、必须关闭重开」的前端真凶（2026-10-16 修复）。
+   这里对 recent_matches 每场的 id/比分/胜负/日期/评分数做指纹，
+   任一变化都触发重渲染，并顺带覆盖 year_stats / upcoming / career。 */
+function dataFingerprint(d){
+  if(!d || typeof d !== 'object') return '';
+  const rm = (d.recent_matches || []).map(m =>
+    [m.id, m.score, m.result, m.date, m.bo,
+     (m.niko && m.niko.ratings ? m.niko.ratings.length : '')].join('/')
+  ).join(';');
+  const ys = d.year_stats || {};
+  const ysSig = [ys.wins, ys.losses, ys.matches, ys.span].join('=');
+  const up = (d.upcoming_tournaments || []).map(t =>
+    [t.short, t.start, t.end, t.date_text].join('=')).join(',');
+  const car = (d.player && d.player.career) ? JSON.stringify(d.player.career) : '';
+  return [rm, ysSig, up, car].join('|');
+}
+
 let __syncSig = '';
 async function sync(labelEl){
   const tag = await pullNewest();
@@ -1457,14 +1479,16 @@ async function sync(labelEl){
     if(up) document.querySelectorAll('.foot').forEach(el => {
       el.textContent = el.textContent.replace(/最近更新：[\s\S]*$/, '最近更新：' + up);
     });
-    const sig = ((FRESH.meta || {}).updated || '') + '|' +
-                (FRESH.upcoming_tournaments || []).map(t => [t.short, t.start, t.end, t.date_text].join('=')).join(',') + '|' +
-                ((FRESH.recent_matches || []).length);
+    // 改用全量内容指纹：比分 / 胜负 / 评分数任一变化都会重渲染，
+    // 不再漏掉「原地补全比分」这类长度不变的数据更新（2026-10-16 修复）
+    const sig = dataFingerprint(FRESH);
     if(sig !== __syncSig){
       __syncSig = sig;
       render();
       if(typeof fx === 'function') fx();
     }
+    // 同步状态明示本次刷新时间与来源，让用户直观看到「页面在自动更新」
+    if(labelEl) labelEl.textContent = '● 已自动同步（' + tag + '）· ' + new Date().toLocaleTimeString('zh-CN');
   }
   return tag;
 }
