@@ -1404,8 +1404,10 @@ function falconsStillIn(t){
   const hasUpcoming = (m) => {
     const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
     const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
-    if(!an || !bn) return false;
-    if(!/falcon/i.test(an + ' ' + bn)) return false;
+    if(!/falcon/i.test((an || '') + ' ' + (bn || ''))) return false;  // ★ 只要法尔孔
+    // 对手待定（b 为空）的 falcons 场也计入：半决赛对手未定时它才是「还有比赛」
+    // （2026-10-16 修复：旧逻辑 `if(!an||!bn) return false` 会把 falcons 待定场
+    //  误判为「已无下一场」，导致首页 hero 跳过本届、错显「下一站赛事」）
     const ts = matchTs(m);
     return ts && ts >= now;
   };
@@ -1791,17 +1793,22 @@ function liveFixture(){
   // 把 schedule（扁平对阵，a/b 是字符串）与 brackets（matchlist/bracket，a/b 是对象）
   // 统一成 {a,b,sa,sb,ts,bo,round,id}，供 hero 渲染直接用。
   const collect = (e, m, roundName) => {
-    const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
-    const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
-    if(!an || !bn) return;
-    if(/^\s*$/.test(an) || /^\s*$/.test(bn)) return;
-    if(/^tbd$/i.test(an) || /^tbd$/i.test(bn)) return;          // 对阵未定的不参与
+    let an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
+    let bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
+    an = an || ''; bn = bn || '';
+    if(/^\s*$/.test(an) && /^\s*$/.test(bn)) return;            // 双方都空才跳过
     if(!/falcon/i.test(an + ' ' + bn)) return;                  // ★ 只要法尔孔
+    // 关键修复（2026-10-16）：法尔孔的下一场常「对手待定」（如半决赛对手要看
+    // 另一场结果才定，Liquipedia 上 b 为空）。旧逻辑 `if(!an||!bn) return`
+    // 把这种场直接丢弃，导致 falcons 的下一场永远进不了 hero，首页只能退而
+    // 显示「下一站赛事」（下一个锦标赛）。现在：对手待定也收录，记为 TBD。
+    if(/^tbd$/i.test(an) || /^tbd$/i.test(bn)) return;
     const ts = matchTs(m);
     if(!ts) return;
     const sa = typeof m.a === 'string' ? m.sa : (m.a && m.a.score);
     const sb = typeof m.b === 'string' ? m.sb : (m.b && m.b.score);
-    const nm = { a: an, b: bn, sa: (sa === undefined ? null : sa), sb: (sb === undefined ? null : sb),
+    const nm = { a: an || 'TBD', b: bn || 'TBD',
+                 sa: (sa === undefined ? null : sa), sb: (sb === undefined ? null : sb),
                  ts, bo: m.bo || '', round: roundName || m.round || m.stage || '', id: m.id || '' };
     if(isLive(ts)) cand.push({ pri: 0, e, m: nm, ts, playing: true });
     else if(ts > now) cand.push({ pri: 1, e, m: nm, ts, playing: false });
@@ -1831,11 +1838,13 @@ function render(){
     target = new Date(m.ts * 1000).toISOString();
     // 双方队标（取不到时用队名首字母占位）
     const side = name => {
-      const lg = teamLogo(ev, name);
+      const isTBD = !name || /^tbd$/i.test(name);   // 对手待定（半决赛对手未定）
+      const disp = isTBD ? '待定' : name;
+      const lg = isTBD ? '' : teamLogo(ev, name);
       return '<div class="hero-team">'
         + (lg ? `<img src="${esc(lg)}" alt="" loading="lazy">`
-              : `<i class="hero-logo-ph">${esc(ini(name))}</i>`)
-        + `<b>${esc(name)}</b></div>`;
+              : `<i class="hero-logo-ph">${esc(isTBD ? '?' : ini(name))}</i>`)
+        + `<b>${esc(disp)}</b></div>`;
     };
     const mid = hasScore ? (m.sa + ':' + m.sb) : 'VS';
     const meta = [esc(ev.name), esc(m.round || '小组赛'), esc(boText(m.bo))].filter(Boolean).join(' · ');
@@ -1873,6 +1882,20 @@ function render(){
     heroTag = '暂无赛程';
     heroInner = `<div class="vs"><div class="team tbd">待定</div></div>
       <div class="hero-sub">暂时没有已公布的比赛</div>`;
+  }
+
+  // 下一站赛事提示：当前 hero 赛事（下一场比赛所属锦标赛）之后的下一个锦标赛。
+  // 这样「下一站赛事」在首屏 hero 内也能看到，不再被「下一场比赛」挤掉
+  // （用户曾问「下一站赛事去哪了」——它一直都在下方「未来赛程」列表，这里补个明示）。
+  const UforNext = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+  const _curEnd = (LF && LF.e && LF.e.end) ? Date.parse(LF.e.end)
+                : (d.featured && d.featured.end ? Date.parse(d.featured.end) : Date.now());
+  const _next = UforNext.find(t => Date.parse(t.start) > _curEnd) || null;
+  if(_next){
+    heroInner += `<div style="margin-top:12px;font-family:var(--mono);font-size:12px;`
+      + `color:rgba(255,255,255,.82);letter-spacing:.04em">下一站赛事：`
+      + `<b style="color:#fff">${esc(_next.name)}</b> `
+      + `<span style="opacity:.75">· ${esc(_next.date_text)} · ${tierText(_next.tier)}</span></div>`;
   }
 
   const Uall = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));

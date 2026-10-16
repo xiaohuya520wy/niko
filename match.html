@@ -1398,8 +1398,10 @@ function falconsStillIn(t){
   const hasUpcoming = (m) => {
     const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
     const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
-    if(!an || !bn) return false;
-    if(!/falcon/i.test(an + ' ' + bn)) return false;
+    if(!/falcon/i.test((an || '') + ' ' + (bn || ''))) return false;  // ★ 只要法尔孔
+    // 对手待定（b 为空）的 falcons 场也计入：半决赛对手未定时它才是「还有比赛」
+    // （2026-10-16 修复：旧逻辑 `if(!an||!bn) return false` 会把 falcons 待定场
+    //  误判为「已无下一场」，导致首页 hero 跳过本届、错显「下一站赛事」）
     const ts = matchTs(m);
     return ts && ts >= now;
   };
