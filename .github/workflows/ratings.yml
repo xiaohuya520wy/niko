@@ -41,13 +41,15 @@ jobs:
         continue-on-error: true
         run: |
           python -m pip install --upgrade pip
-          # 注意：scrapling 不提供 [playwright] 这个 extra，必须分开装。
-          # StealthyFetcher 只需 import 得到 playwright 包即可。
-          pip install scrapling playwright
+          # scrapling 0.4.15 只有一个 extra = [fetchers]，它会一并装好
+          # playwright + curl_cffi + patchright + browserforge + apify 指纹库，
+          # 这些正是 StealthyFetcher 解 Cloudflare 必需的。装错 extra 会导致
+          # from scrapling.fetchers import StealthyFetcher 失败 → 回落直连 urllib → 403。
+          pip install "scrapling[fetchers]"
           python -m playwright install chromium
-          # 系统级依赖（无头 Chromium 运行所需）；失败不阻断主流程
-          sudo python -m playwright install-deps chromium || true
-          python -c "import scrapling, playwright; print('scrapling', scrapling.__version__, '| playwright ok')"
+          python -m patchright install chromium || true
+          PY=$(command -v python); sudo "$PY" -m playwright install-deps chromium || true
+          python -c "from scrapling.fetchers import StealthyFetcher; print('StealthyFetcher import OK')"
 
       - name: 回补缺失评分
         continue-on-error: true
