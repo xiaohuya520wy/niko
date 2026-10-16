@@ -95,6 +95,18 @@
       "url": "https://liquipedia.net/counterstrike/Intel%20Extreme%20Masters/2026/Beijing"
     },
     {
+      "name": "BLAST Rivals Fall 2026",
+      "short": "BLAST Rivals Fall 2026",
+      "zh": "BLAST Rivals Fall 2026",
+      "page": "BLAST/Rivals/2026/Fall",
+      "tier": "S-Tier",
+      "date_text": "Nov 11–15",
+      "start": "2026-11-11T00:00:00+00:00",
+      "end": "2026-11-15T23:59:59+00:00",
+      "status": "upcoming",
+      "url": "https://liquipedia.net/counterstrike/BLAST/Rivals/2026/Fall"
+    },
+    {
       "name": "PGL Bucharest 2027",
       "short": "PGL 布加勒斯特 2027",
       "zh": "PGL 布加勒斯特 2027",
@@ -120,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-16T13:10:13+00:00"
+    "updated": "2026-10-16T18:12:17+00:00"
   },
   "squad": [
     {
