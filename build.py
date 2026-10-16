@@ -1462,7 +1462,7 @@ function dataFingerprint(d){
   if(!d || typeof d !== 'object') return '';
   const rm = (d.recent_matches || []).map(m =>
     [m.id, m.score, m.result, m.date, m.bo,
-     (m.niko && m.niko.ratings ? m.niko.ratings.length : '')].join('/')
+     (m.niko && m.niko.ratings ? m.niko.ratings.join(',') : '')].join('/')
   ).join(';');
   const ys = d.year_stats || {};
   const ysSig = [ys.wins, ys.losses, ys.matches, ys.span].join('=');
