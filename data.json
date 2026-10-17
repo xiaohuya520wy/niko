@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-16T19:01:16+00:00"
+    "updated": "2026-10-17T00:13:12+00:00"
   },
   "squad": [
     {
@@ -399,6 +399,25 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-10-17-betboom-team",
+      "date": "2026-10-17T17:00:00Z",
+      "opponent": "BetBoom Team",
+      "score": "0-0",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "2026",
+      "stage": "",
+      "maps": [],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2399415/match",
+        "vods": [],
+        "hltv_maps": []
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-10-15-9z-team",
       "date": "2026-10-15T11:30:00Z",
@@ -6395,11 +6414,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-10-15",
-    "matches": 65,
+    "to": "2026-10-17",
+    "matches": 66,
     "wins": 46,
-    "losses": 19,
-    "win_rate": 70.8,
+    "losses": 20,
+    "win_rate": 69.7,
     "events": 16
   }
 }
