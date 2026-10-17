@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-17T12:59:39+00:00"
+    "updated": "2026-10-17T18:37:59+00:00"
   },
   "squad": [
     {
@@ -403,16 +403,67 @@
       "id": "2026-10-17-betboom-team",
       "date": "2026-10-17T17:00:00Z",
       "opponent": "BetBoom Team",
-      "score": "0-0",
+      "score": "1-0",
       "result": "L",
       "bo": "Bo3",
       "event": "2026",
       "stage": "",
-      "maps": [],
+      "maps": [
+        {
+          "map": "Anubis",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "8",
+            "ct": "5"
+          },
+          "opponent": {
+            "rounds": "5",
+            "t": "1",
+            "ct": "4"
+          }
+        },
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399415/match",
         "vods": [],
-        "hltv_maps": []
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=242012"
+          }
+        ]
       },
       "niko": {
         "ratings": []
