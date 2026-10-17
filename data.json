@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-17T18:37:59+00:00"
+    "updated": "2026-10-17T18:55:20+00:00"
   },
   "squad": [
     {
@@ -429,14 +429,14 @@
           "vetoed": false,
           "falcons_win": false,
           "falcons": {
-            "rounds": "",
-            "t": "",
+            "rounds": "7",
+            "t": "7",
             "ct": ""
           },
           "opponent": {
-            "rounds": "",
+            "rounds": "5",
             "t": "",
-            "ct": ""
+            "ct": "5"
           }
         },
         {
