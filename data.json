@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-17T18:55:20+00:00"
+    "updated": "2026-10-18T00:12:48+00:00"
   },
   "squad": [
     {
@@ -400,10 +400,29 @@
   ],
   "recent_matches": [
     {
+      "id": "2026-10-18-aurora-gaming",
+      "date": "2026-10-18T11:30:00Z",
+      "opponent": "Aurora Gaming",
+      "score": "0-0",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "2026",
+      "stage": "",
+      "maps": [],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2399416/match",
+        "vods": [],
+        "hltv_maps": []
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
+    {
       "id": "2026-10-17-betboom-team",
       "date": "2026-10-17T17:00:00Z",
       "opponent": "BetBoom Team",
-      "score": "1-0",
+      "score": "1-2",
       "result": "L",
       "bo": "Bo3",
       "event": "2026",
@@ -429,13 +448,13 @@
           "vetoed": false,
           "falcons_win": false,
           "falcons": {
-            "rounds": "7",
+            "rounds": "14",
             "t": "7",
-            "ct": ""
+            "ct": "5"
           },
           "opponent": {
-            "rounds": "5",
-            "t": "",
+            "rounds": "16",
+            "t": "7",
             "ct": "5"
           }
         },
@@ -444,14 +463,14 @@
           "vetoed": false,
           "falcons_win": false,
           "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "7",
+            "t": "1",
+            "ct": "6"
           },
           "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "13",
+            "t": "6",
+            "ct": "7"
           }
         }
       ],
@@ -462,6 +481,14 @@
           {
             "game": 1,
             "url": "https://www.hltv.org/?pageid=188&matchid=242012"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=242022"
+          },
+          {
+            "game": 3,
+            "url": "https://www.hltv.org/?pageid=188&matchid=242030"
           }
         ]
       },
@@ -6465,11 +6492,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-10-17",
-    "matches": 66,
+    "to": "2026-10-18",
+    "matches": 67,
     "wins": 46,
-    "losses": 20,
-    "win_rate": 69.7,
+    "losses": 21,
+    "win_rate": 68.7,
     "events": 16
   }
 }
