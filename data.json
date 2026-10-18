@@ -37,7 +37,7 @@
     "born": "1997 年 2 月 16 日",
     "years_active": "2009 年至今",
     "status": "现役",
-    "winnings": "$2,013,746",
+    "winnings": "$2,018,746",
     "role_liq": "突破位",
     "gear": {
       "mouse": "Razer DeathAdder V3 Pro",
@@ -70,18 +70,6 @@
   },
   "next_match": null,
   "upcoming_tournaments": [
-    {
-      "name": "Thunderpick World Champ. '26",
-      "short": "Thunderpick 世界冠军赛 2026",
-      "zh": "Thunderpick 世界冠军赛 2026",
-      "page": "Thunderpick/World Championship/2026",
-      "tier": "S-Tier",
-      "date_text": "Oct 14–18",
-      "start": "2027-10-14T00:00:00+00:00",
-      "end": "2027-10-18T23:59:59+00:00",
-      "status": "upcoming",
-      "url": "https://liquipedia.net/counterstrike/Thunderpick/World%20Championship/2026"
-    },
     {
       "name": "IEM Beijing 2026",
       "short": "IEM 北京 2026",
@@ -132,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-18T12:59:21+00:00"
+    "updated": "2026-10-18T18:12:41+00:00"
   },
   "squad": [
     {
@@ -403,7 +391,7 @@
       "id": "2026-10-18-aurora-gaming",
       "date": "2026-10-18T11:30:00Z",
       "opponent": "Aurora Gaming",
-      "score": "1-0",
+      "score": "1-2",
       "result": "L",
       "bo": "Bo3",
       "event": "2026",
@@ -429,14 +417,14 @@
           "vetoed": false,
           "falcons_win": false,
           "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "17",
+            "t": "4",
+            "ct": "8"
           },
           "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "19",
+            "t": "4",
+            "ct": "8"
           }
         },
         {
@@ -444,14 +432,14 @@
           "vetoed": false,
           "falcons_win": false,
           "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "9",
+            "t": "2",
+            "ct": "7"
           },
           "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
+            "rounds": "13",
+            "t": "5",
+            "ct": "8"
           }
         }
       ],
@@ -462,6 +450,14 @@
           {
             "game": 1,
             "url": "https://www.hltv.org/?pageid=188&matchid=242055"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=242062"
+          },
+          {
+            "game": 3,
+            "url": "https://www.hltv.org/?pageid=188&matchid=242073"
           }
         ]
       },
