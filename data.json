@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-18T07:02:16+00:00"
+    "updated": "2026-10-18T12:38:12+00:00"
   },
   "squad": [
     {
@@ -403,16 +403,67 @@
       "id": "2026-10-18-aurora-gaming",
       "date": "2026-10-18T11:30:00Z",
       "opponent": "Aurora Gaming",
-      "score": "0-0",
+      "score": "1-0",
       "result": "L",
       "bo": "Bo3",
       "event": "2026",
       "stage": "",
-      "maps": [],
+      "maps": [
+        {
+          "map": "Anubis",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "9",
+            "ct": "4"
+          },
+          "opponent": {
+            "rounds": "8",
+            "t": "5",
+            "ct": "3"
+          }
+        },
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        },
+        {
+          "map": "Nuke",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399416/match",
         "vods": [],
-        "hltv_maps": []
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=242055"
+          }
+        ]
       },
       "niko": {
         "ratings": []
