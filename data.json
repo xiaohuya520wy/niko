@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-20T07:06:27+00:00"
+    "updated": "2026-10-20T12:13:08+00:00"
   },
   "squad": [
     {
@@ -387,6 +387,25 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-11-vitality",
+      "date": "2026-11-11T04:30:00Z",
+      "opponent": "Vitality",
+      "score": "0-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Fall",
+      "stage": "",
+      "maps": [],
+      "links": {
+        "hltv_match": "",
+        "vods": [],
+        "hltv_maps": []
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-10-18-aurora-gaming",
       "date": "2026-10-18T11:30:00Z",
@@ -6551,11 +6570,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-10-18",
-    "matches": 67,
-    "wins": 46,
+    "to": "2026-11-11",
+    "matches": 68,
+    "wins": 47,
     "losses": 21,
-    "win_rate": 68.7,
-    "events": 16
+    "win_rate": 69.1,
+    "events": 17
   }
 }
