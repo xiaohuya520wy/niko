@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-20T19:02:34+00:00"
+    "updated": "2026-10-21T00:13:18+00:00"
   },
   "squad": [
     {
@@ -398,7 +398,7 @@
       "stage": "",
       "maps": [],
       "links": {
-        "hltv_match": "",
+        "hltv_match": "https://www.hltv.org/matches/2399852/match",
         "vods": [],
         "hltv_maps": []
       },
