@@ -241,6 +241,42 @@ def parse_default_bo(h: str) -> str:
     return m.group(1) if m else ""
 
 
+def _clean_literal(s: str) -> str:
+    """占位对手文本清洗：'Group B 2<sup>nd</sup> Place' → 'Group B 2nd Place'。
+
+    行内标签（sup/sub/small/b/i/em/strong/span）直接去掉不加空格（否则 '2nd'
+    会被拆成 '2 nd'）；块级标签（div/br 等）替换成空格防止单词粘连。"""
+    s = re.sub(r"</?(?:sup|sub|small|b|i|em|strong|span)\b[^>]*>", "", s or "", flags=re.I)
+    s = re.sub(r"<[^>]+>", " ", s)
+    s = H.unescape(s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def _opponent_name(row: str) -> str:
+    """从一个 match-info-opponent-row 块里取对手名。
+
+    优先级：队伍链接（真实队名）→ brkts-opponent-block-literal 占位文本
+    （2026-10 版新模板：小组未打完时对手是 'Group B 2nd Place' 这类纯文本，
+    没有队伍链接）→ 'TBD'。
+    旧逻辑只认队伍链接，占位对手直接丢 → 整场被丢 → IEM 北京 2026 页
+    upcoming=0 触发改版降级横幅（2026-10-23 实测）。
+    """
+    nm = ""
+    for am in re.finditer(r'<a href="/counterstrike/([^"#?]+)"[^>]*title="([^"]*)"', row):
+        path, title = am.group(1), H.unescape(am.group(2)).strip()
+        # 去掉 MediaWiki 命名空间（Special/Category/File/Template…）与含冒号的伪链接
+        if ":" in path:
+            continue
+        nm = re.sub(r"^Team\s+", "", title or path.replace("_", " ").strip())
+        break
+    if not nm or nm.upper() in ("TBD", "TO BE DETERMINED", "–", "-"):
+        lit = re.search(r'brkts-opponent-block-literal[^>]*>(.*?)</div>', row, re.S)
+        nm = _clean_literal(lit.group(1)) if lit else ""
+    if not nm or nm.upper() in ("TBD", "TO BE DETERMINED", "–", "-"):
+        nm = "TBD"
+    return nm
+
+
 def parse_upcoming(h: str, limit=16):
     """页面顶部 Upcoming Matches 区：即将开赛的对阵与时间戳。
     新版 Liquipedia 在开赛前把赛程放这里（match-info 卡片），分支图里还是 TBD。"""
@@ -263,16 +299,7 @@ def parse_upcoming(h: str, limit=16):
         # 2026-10-03 实测灌出 "Special:Stream/twitch/ESL Counter-Strike" 这种脏对阵。
         sides = []
         for row in re.split(r'<div class="match-info-opponent-row(?:"|\s)', blk)[1:3]:
-            nm = ""
-            for am in re.finditer(r'<a href="/counterstrike/([^"#?]+)"[^>]*title="([^"]*)"', row):
-                path, title = am.group(1), H.unescape(am.group(2)).strip()
-                # 去掉 MediaWiki 命名空间（Special/Category/File/Template…）与含冒号的伪链接
-                if ":" in path:
-                    continue
-                nm = re.sub(r"^Team\s+", "", title or path.replace("_", " ").strip())
-                break
-            if not nm or nm.upper() in ("TBD", "TO BE DETERMINED", "–", "-"):
-                continue
+            nm = _opponent_name(row)
             sc = re.search(r'match-info-opponent-score[^>]*>\s*(\d+)', row)
             sides.append({"name": nm, "score": int(sc.group(1)) if sc else None})
         if len(sides) < 2:
@@ -291,7 +318,54 @@ def parse_upcoming(h: str, limit=16):
             "b": {"name": sides[1]["name"], "full": sides[1]["name"], "short": "",
                   "score": sb, "win": wb},
         })
+    # ---- Plan B（改版免疫兜底）：模板路径一无所获、但页面确有带时间戳的比赛时，
+    # 用通用扫描器保证数据更新不中断（对手挖不到就记 TBD）。
+    if not out:
+        out = upcoming_generic(h, default_bo, limit)
     return out[:limit]
+
+
+def upcoming_generic(h: str, default_bo: str = "", limit=16):
+    """Plan B：不依赖任何卡片模板的「即将开赛」兜底解析器。
+
+    背景（2026-10-23 用户要求「彻底解决、以后改版不影响数据更新」）：Liquipedia
+    会不定期改版（brkts-matchlist → match-info 卡片就是一次），每次改版都会把
+    某个精确模板的解析器打挂，触发降级——旧数据虽然保留，但更新中断。
+    本函数只依赖一个**最不可能消失的事实**：比赛带有 timer-object
+    data-timestamp。全文扫描时间戳，从周边尽量挖对手名（opponent-row 链接 →
+    占位文本 → matchlist aria-label → team-template），全挖不到就记 TBD。
+    Liquipedia 以后再怎么改版，只要页面还标「这场比赛几点开打」，这里就能
+    产出场次，数据更新不会断流。"""
+    out, seen = [], set()
+    for m in re.finditer(r'timer-object[^>]*data-timestamp="(\d+)"', h):
+        ts = int(m.group(1))
+        blk = h[m.start(): m.start() + 4000]
+        stage = re.search(r'match-info-stage">([^<]*)<', blk)
+        names = []
+        for row in re.split(r'<div class="match-info-opponent-row(?:"|\s)', blk)[1:3]:
+            names.append(_opponent_name(row))
+        if len(names) < 2:  # matchlist 风格页面的兜底
+            for x in re.findall(r'brkts-matchlist-opponent[^>]*aria-label="([^"]*)"', blk):
+                x = re.sub(r"^Team\s+", "", H.unescape(x).strip())
+                if x and x.upper() not in ("TBD", "TO BE DETERMINED", "–", "-"):
+                    names.append(x)
+                    if len(names) == 2:
+                        break
+        names += ["TBD"] * (2 - len(names))
+        key = (ts, names[0], names[1])
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append({
+            "stage": stage.group(1).strip() if stage else "即将开赛",
+            "bo": default_bo,
+            "ts": ts,
+            "a": {"name": names[0], "full": names[0], "short": "", "score": None, "win": False},
+            "b": {"name": names[1], "full": names[1], "short": "", "score": None, "win": False},
+        })
+        if len(out) >= limit:
+            break
+    return out
 
 
 def parse_brackets(h: str):

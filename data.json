@@ -37,7 +37,7 @@
     "born": "1997 年 2 月 16 日",
     "years_active": "2009 年至今",
     "status": "现役",
-    "winnings": "$2,018,746",
+    "winnings": "$2,013,746",
     "role_liq": "突破位",
     "gear": {
       "mouse": "Razer DeathAdder V3 Pro",
@@ -71,6 +71,18 @@
   "next_match": null,
   "upcoming_tournaments": [
     {
+      "name": "Thunderpick World Champ. '26",
+      "short": "Thunderpick 世界冠军赛 2026",
+      "zh": "Thunderpick 世界冠军赛 2026",
+      "page": "Thunderpick/World Championship/2026",
+      "tier": "S-Tier",
+      "date_text": "Oct 14–18",
+      "start": "2026-10-14T00:00:00+00:00",
+      "end": "2026-10-18T23:59:59+00:00",
+      "status": "opponent_tbd",
+      "url": "https://liquipedia.net/counterstrike/Thunderpick/World%20Championship/2026"
+    },
+    {
       "name": "IEM Beijing 2026",
       "short": "IEM 北京 2026",
       "zh": "IEM 北京 2026",
@@ -79,20 +91,8 @@
       "date_text": "Nov 02–08",
       "start": "2026-11-02T00:00:00+00:00",
       "end": "2026-11-08T23:59:59+00:00",
-      "status": "upcoming",
+      "status": "opponent_tbd",
       "url": "https://liquipedia.net/counterstrike/Intel%20Extreme%20Masters/2026/Beijing"
-    },
-    {
-      "name": "BLAST Rivals Fall 2026",
-      "short": "BLAST Rivals Fall 2026",
-      "zh": "BLAST Rivals Fall 2026",
-      "page": "BLAST/Rivals/2026/Fall",
-      "tier": "S-Tier",
-      "date_text": "Nov 11–15",
-      "start": "2026-11-11T00:00:00+00:00",
-      "end": "2026-11-15T23:59:59+00:00",
-      "status": "upcoming",
-      "url": "https://liquipedia.net/counterstrike/BLAST/Rivals/2026/Fall"
     },
     {
       "name": "PGL Bucharest 2027",
@@ -103,7 +103,7 @@
       "date_text": "Jan 17–24",
       "start": "2027-01-17T00:00:00+00:00",
       "end": "2027-01-24T23:59:59+00:00",
-      "status": "upcoming",
+      "status": "opponent_tbd",
       "url": "https://liquipedia.net/counterstrike/PGL/2027/Bucharest"
     }
   ],
@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-23T06:26:27+00:00"
+    "updated": "2026-10-13T08:00:19+00:00"
   },
   "squad": [
     {
@@ -388,441 +388,22 @@
   ],
   "recent_matches": [
     {
-      "id": "2026-11-11-vitality",
-      "date": "2026-11-11T05:30:00Z",
-      "opponent": "Vitality",
+      "id": "2026-10-09-spirit",
+      "date": "2026-10-09T16:00:00Z",
+      "opponent": "Spirit",
       "score": "0-0",
-      "result": "W",
+      "result": "L",
       "bo": "Bo3",
-      "event": "Fall",
+      "event": "Season 24",
       "stage": "",
       "maps": [],
       "links": {
-        "hltv_match": "https://www.hltv.org/matches/2399852/match",
+        "hltv_match": "https://www.hltv.org/matches/2398753/match",
         "vods": [],
         "hltv_maps": []
       },
       "niko": {
         "ratings": []
-      }
-    },
-    {
-      "id": "2026-10-18-aurora-gaming",
-      "date": "2026-10-18T11:30:00Z",
-      "opponent": "Aurora Gaming",
-      "score": "1-2",
-      "result": "L",
-      "bo": "Bo3",
-      "event": "2026",
-      "stage": "",
-      "maps": [
-        {
-          "map": "Anubis",
-          "vetoed": false,
-          "falcons_win": true,
-          "falcons": {
-            "rounds": "13",
-            "t": "9",
-            "ct": "4"
-          },
-          "opponent": {
-            "rounds": "8",
-            "t": "5",
-            "ct": "3"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "17",
-            "t": "4",
-            "ct": "8"
-          },
-          "opponent": {
-            "rounds": "19",
-            "t": "4",
-            "ct": "8"
-          }
-        },
-        {
-          "map": "Nuke",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "9",
-            "t": "2",
-            "ct": "7"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "5",
-            "ct": "8"
-          }
-        }
-      ],
-      "links": {
-        "hltv_match": "https://www.hltv.org/matches/2399416/match",
-        "vods": [],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=242055"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=242062"
-          },
-          {
-            "game": 3,
-            "url": "https://www.hltv.org/?pageid=188&matchid=242073"
-          }
-        ]
-      },
-      "niko": {
-        "ratings": [
-          1.17,
-          1.35,
-          1.02
-        ],
-        "kd": "2 : 3/4 : 3/2 : 3",
-        "adr": 4.7
-      }
-    },
-    {
-      "id": "2026-10-17-betboom-team",
-      "date": "2026-10-17T17:00:00Z",
-      "opponent": "BetBoom Team",
-      "score": "1-2",
-      "result": "L",
-      "bo": "Bo3",
-      "event": "2026",
-      "stage": "",
-      "maps": [
-        {
-          "map": "Anubis",
-          "vetoed": false,
-          "falcons_win": true,
-          "falcons": {
-            "rounds": "13",
-            "t": "8",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "5",
-            "t": "1",
-            "ct": "4"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "14",
-            "t": "7",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "16",
-            "t": "7",
-            "ct": "5"
-          }
-        },
-        {
-          "map": "Mirage",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "7",
-            "t": "1",
-            "ct": "6"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "6",
-            "ct": "7"
-          }
-        }
-      ],
-      "links": {
-        "hltv_match": "https://www.hltv.org/matches/2399415/match",
-        "vods": [],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=242012"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=242022"
-          },
-          {
-            "game": 3,
-            "url": "https://www.hltv.org/?pageid=188&matchid=242030"
-          }
-        ]
-      },
-      "niko": {
-        "ratings": [
-          1.36,
-          0.83,
-          0.75
-        ],
-        "kd": "2 : 1/2 : 7/1 : 1",
-        "adr": 3.7
-      }
-    },
-    {
-      "id": "2026-10-15-9z-team",
-      "date": "2026-10-15T11:30:00Z",
-      "opponent": "9z Team",
-      "score": "2-1",
-      "result": "W",
-      "bo": "Bo3",
-      "event": "2026",
-      "stage": "",
-      "maps": [
-        {
-          "map": "Nuke",
-          "vetoed": false,
-          "falcons_win": true,
-          "falcons": {
-            "rounds": "13",
-            "t": "5",
-            "ct": "8"
-          },
-          "opponent": {
-            "rounds": "9",
-            "t": "4",
-            "ct": "5"
-          }
-        },
-        {
-          "map": "Mirage",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "8",
-            "t": "3",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "4",
-            "ct": "9"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": false,
-          "falcons_win": true,
-          "falcons": {
-            "rounds": "13",
-            "t": "8",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "9",
-            "t": "5",
-            "ct": "4"
-          }
-        }
-      ],
-      "links": {
-        "hltv_match": "https://www.hltv.org/matches/2399409/match",
-        "vods": [],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241748"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241752"
-          },
-          {
-            "game": 3,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241758"
-          }
-        ]
-      },
-      "niko": {
-        "ratings": [
-          0.65,
-          1.38,
-          1.34
-        ],
-        "kd": "1 : 2/3 : 1/4 : 0",
-        "adr": 3.0
-      }
-    },
-    {
-      "id": "2026-10-14-ninjas-in-pyjamas",
-      "date": "2026-10-14T12:20:00Z",
-      "opponent": "Ninjas in Pyjamas",
-      "score": "2-0",
-      "result": "W",
-      "bo": "Bo3",
-      "event": "2026",
-      "stage": "",
-      "maps": [
-        {
-          "map": "Ancient",
-          "vetoed": false,
-          "falcons_win": true,
-          "falcons": {
-            "rounds": "16",
-            "t": "4",
-            "ct": "8"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "4",
-            "ct": "8"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": false,
-          "falcons_win": true,
-          "falcons": {
-            "rounds": "13",
-            "t": "8",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "6",
-            "t": "2",
-            "ct": "4"
-          }
-        },
-        {
-          "map": "Mirage",
-          "vetoed": true,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          },
-          "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          }
-        }
-      ],
-      "links": {
-        "hltv_match": "https://www.hltv.org/matches/2399385/match",
-        "vods": [],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241633"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241645"
-          }
-        ]
-      },
-      "niko": {
-        "ratings": [
-          0.81,
-          1.82
-        ],
-        "kd": "4 : 3/4 : 1",
-        "adr": 4.0
-      }
-    },
-    {
-      "id": "2026-10-09-spirit",
-      "date": "2026-10-09T17:05:00Z",
-      "opponent": "Spirit",
-      "score": "0-2",
-      "result": "L",
-      "bo": "Bo3",
-      "event": "Season 24",
-      "stage": "",
-      "maps": [
-        {
-          "map": "Mirage",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "8",
-            "t": "5",
-            "ct": "3"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "9",
-            "ct": "4"
-          }
-        },
-        {
-          "map": "Anubis",
-          "vetoed": false,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "10",
-            "t": "5",
-            "ct": "5"
-          },
-          "opponent": {
-            "rounds": "13",
-            "t": "7",
-            "ct": "6"
-          }
-        },
-        {
-          "map": "Dust II",
-          "vetoed": true,
-          "falcons_win": false,
-          "falcons": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          },
-          "opponent": {
-            "rounds": "",
-            "t": "",
-            "ct": ""
-          }
-        }
-      ],
-      "links": {
-        "hltv_match": "https://www.hltv.org/matches/2398753/match",
-        "vods": [
-          {
-            "game": 1,
-            "url": "https://youtu.be/LuW2Lg4PA7k&t=25"
-          },
-          {
-            "game": 2,
-            "url": "https://youtu.be/LuW2Lg4PA7k&t=3055"
-          }
-        ],
-        "hltv_maps": [
-          {
-            "game": 1,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241229"
-          },
-          {
-            "game": 2,
-            "url": "https://www.hltv.org/?pageid=188&matchid=241241"
-          }
-        ]
-      },
-      "niko": {
-        "ratings": [
-          0.86,
-          1.07
-        ],
-        "kd": "4 : 1/1 : 3",
-        "adr": 3.0
       }
     },
     {
@@ -913,13 +494,7 @@
         ]
       },
       "niko": {
-        "ratings": [
-          1.61,
-          0.86,
-          2.12
-        ],
-        "kd": "2 : 1/8 : 3/3 : 1",
-        "adr": 5.3
+        "ratings": []
       }
     },
     {
@@ -1010,13 +585,7 @@
         ]
       },
       "niko": {
-        "ratings": [
-          1.33,
-          0.73,
-          0.74
-        ],
-        "kd": "1 : 0/0 : 2/1 : 2",
-        "adr": 2.0
+        "ratings": []
       }
     },
     {
@@ -6570,11 +6139,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-11",
-    "matches": 68,
-    "wins": 47,
-    "losses": 21,
-    "win_rate": 69.1,
-    "events": 17
+    "to": "2026-10-09",
+    "matches": 63,
+    "wins": 44,
+    "losses": 19,
+    "win_rate": 69.8,
+    "events": 15
   }
 }
