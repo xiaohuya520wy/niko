@@ -784,7 +784,7 @@ def build_config(old_events, allow_net=True):
     """生成本轮要抓的赛事清单（自动全体）。
 
     - 动态未来赛事：战队页 upcoming（带视野过滤，太远的暂不抓详情）。
-    - 日历自动发现：Liquipedia:Matches 总表（猎鹰不参加的赛事也自动上站）。
+    - 日历自动发现：Liquipedia:Matches 总表（仅纳入「法尔孔参赛」的赛事；本 tracker 为 NiKo/法尔孔专属，法尔孔未参赛的赛事一律不进赛事中心）。
     - 复活 live：上一轮 event.json 中 status=live 的（防离开 upcoming 后消失）。
     - 近期常驻：RECENT_CONFIG。
     - 兜底：动态为空时用 SEED_NEXT_CONFIG。
@@ -933,6 +933,7 @@ def main():
 
     events = []
     used_ids = set()
+    rejected_ids = set()
     degraded = []
     fetched = 0
     LIVE_ONLY_HORIZON = dt.timedelta(days=3)
@@ -1015,6 +1016,19 @@ def main():
                 print(f"[放弃] {ev['name']}（tier={ev.get('tier') or 'Unknown'}，"
                       f"非 S/A 级，已入黑名单）")
                 continue
+        # 猎鹰参赛闸门：本 tracker 是 NiKo(法尔孔) 专属，法尔孔未参赛的
+        # 赛事一律不进赛事中心（2026-10-23 用户反馈 PGL Masters 无 NiKo 却自动上站）。
+        # 仅在「已解析出参赛队名单」时判定，队名单解析失败(空)则保守保留，
+        # 避免误杀真实法尔孔赛事。
+        if cfg.get("_discover"):
+            _tnames = [(t.get("name") or "").lower() for t in ev.get("teams", [])]
+            if _tnames and not any("falcons" in n for n in _tnames):
+                rej = load_discover_reject()
+                rej.add(cfg["page"])
+                save_discover_reject(rej)
+                rejected_ids.add(sid)
+                print(f"[放弃] {ev['name']}（法尔孔未参赛，已入黑名单）")
+                continue
         events.append(ev)
         used_ids.add(ev["id"])
         if cfg.get("_discover"):
@@ -1028,8 +1042,15 @@ def main():
     # 保证赛事中心永不丢赛事（进行中转正、已结束归档都保留，形成完整全体）。
     for e in old_events:
         sid = e.get("id")
-        if not sid or sid in used_ids:
+        if not sid or sid in used_ids or sid in rejected_ids:
             continue
+        # 法尔孔参赛闸门同样作用于「携带归档」：发现的归档赛事若已解析出
+        # 队名单且无法尔孔，则丢弃（本 tracker 为 NiKo/法尔孔专属）。
+        if e.get("_discover"):
+            _tn = [(t.get("name") or "").lower() for t in e.get("teams", [])]
+            if _tn and not any("falcons" in n for n in _tn):
+                print(f"[丢弃] {e.get('name', sid)}（归档赛事法尔孔未参赛）")
+                continue
         ev = _recompute_status(dict(e), now)
         if ev["status"] == "done":
             ev["tag"] = "recent"
