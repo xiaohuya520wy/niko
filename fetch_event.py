@@ -410,10 +410,12 @@ def build_event(cfg, html_text, base_info, now):
             if de:
                 end_iso = de
         date_text = base_info.get("date_text") or date_text
-        tier = base_info.get("tier") or cfg["tier"]
+        # tier 以赛事页 infobox 为准（Liquipedia 权威），base/手填只作兑底
+        tier = ((d.get("info") or {}).get("tier")
+                or base_info.get("tier") or cfg["tier"])
         note = base_info.get("note", "")
     else:
-        tier = cfg["tier"]
+        tier = (d.get("info") or {}).get("tier") or cfg["tier"]
         note = ""
         date_text = ""
         if start_iso:
@@ -669,6 +671,77 @@ def derive_upcoming_list():
     return out
 
 
+# ----------------------------------------------------------- 日历自动发现
+# 2026-10-23 用户要求「不能每次都让我说一个新赛事才上站」。猎鹰队页只能覆盖
+# 猎鹰参加的赛事；Liquipedia:Matches（"Upcoming & ongoing matches" 总表）
+# 收录**所有**有比赛安排的赛事，match-info-tournament 块里带赛事页链接——
+# 以它为发现源，新赛事零手动上站。
+MATCHES_PORTAL = "Liquipedia:Matches"
+PORTAL_CACHE = ROOT / "_cache" / "matches_portal.html"
+PORTAL_CACHE_MAX_AGE = 30 * 60          # 30 分钟缓存，独立于赛事页缓存
+DISCOVER_LIMIT = 4                      # 单轮最多新增发现数（控制抓取成本）
+DISCOVER_MIN_ROWS = 2                   # 总表里至少出现 N 场才算正式赛事（滤掉杂鱼单场）
+DISCOVER_REJECT_CACHE = ROOT / "_cache" / "discover_reject.json"
+
+
+def load_discover_reject():
+    """被 tier 闸门拒绝过的赛事页名集合（持久化，避免每轮重抓重拒）。"""
+    try:
+        return set(json.loads(DISCOVER_REJECT_CACHE.read_text(encoding="utf-8")))
+    except Exception:
+        return set()
+
+
+def save_discover_reject(rej):
+    try:
+        DISCOVER_REJECT_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        DISCOVER_REJECT_CACHE.write_text(json.dumps(sorted(rej), ensure_ascii=False),
+                                         encoding="utf-8")
+    except Exception:
+        pass
+
+
+def parse_portal_tournaments(h: str):
+    """Liquipedia:Matches 总表 → {赛事页名: 比赛出现次数}。
+
+    注意 href 可能带锚点（/path/to/Tournament#Results），先用 [^"]+ 整体
+    捕获再手动去 #/? 部分——用 [^"#?]+ 会在 # 处断掉且匹配失败（实测踩坑）。"""
+    tour = {}
+    for m in re.finditer(r'class="match-info-tournament"', h):
+        a = re.search(r'<a href="/counterstrike/([^"]+)"',
+                      h[m.start(): m.start() + 500])
+        if not a:
+            continue
+        page = urllib.parse.unquote(a.group(1)).split("#")[0].split("?")[0]
+        page = page.strip("/").replace("_", " ").strip()
+        # 排除命名空间页（Special:Stream 等）与空值
+        if not page or ":" in page:
+            continue
+        tour[page] = tour.get(page, 0) + 1
+    return tour
+
+
+def load_portal_tournaments(allow_net: bool):
+    """带 30 分钟缓存的日历页抓取；失败时回退旧缓存，再不行返回空。"""
+    if PORTAL_CACHE.exists() and PORTAL_CACHE.stat().st_size > 2000:
+        if time.time() - PORTAL_CACHE.stat().st_mtime < PORTAL_CACHE_MAX_AGE:
+            return parse_portal_tournaments(PORTAL_CACHE.read_text(encoding="utf-8"))
+    if not allow_net:
+        if PORTAL_CACHE.exists() and PORTAL_CACHE.stat().st_size > 2000:
+            return parse_portal_tournaments(PORTAL_CACHE.read_text(encoding="utf-8"))
+        return {}
+    try:
+        h = fetch_page(MATCHES_PORTAL)
+        PORTAL_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        PORTAL_CACHE.write_text(h, encoding="utf-8")
+        return parse_portal_tournaments(h)
+    except Exception as e:                      # noqa: BLE001
+        print(f"[warn] 日历页抓取失败（{type(e).__name__}: {e}）")
+        if PORTAL_CACHE.exists() and PORTAL_CACHE.stat().st_size > 2000:
+            return parse_portal_tournaments(PORTAL_CACHE.read_text(encoding="utf-8"))
+        return {}
+
+
 def _recompute_status(ev, now):
     """用 start/end 重算状态（upcoming/live/done），用于复用旧数据时不出现永久 live。"""
     s, e = ev.get("start"), ev.get("end")
@@ -707,10 +780,11 @@ def _up_status(s, e, now):
     return "done"
 
 
-def build_config(old_events):
+def build_config(old_events, allow_net=True):
     """生成本轮要抓的赛事清单（自动全体）。
 
     - 动态未来赛事：战队页 upcoming（带视野过滤，太远的暂不抓详情）。
+    - 日历自动发现：Liquipedia:Matches 总表（猎鹰不参加的赛事也自动上站）。
     - 复活 live：上一轮 event.json 中 status=live 的（防离开 upcoming 后消失）。
     - 近期常驻：RECENT_CONFIG。
     - 兜底：动态为空时用 SEED_NEXT_CONFIG。
@@ -729,6 +803,12 @@ def build_config(old_events):
             c["_base"] = base
         cfg.append(c)
 
+    # 静态清单占用的页名：发现步骤跳过（它们的 zh/tier 以静态配置为准）
+    reserved = ({slug(c["page"]) for c in RECENT_CONFIG}
+                | {slug(c["page"]) for c in SEED_NEXT_CONFIG}
+                | {slug(k) for k in ZH_MAP})
+    old_ids = {e.get("id") for e in old_events if e.get("id")}
+
     # 1) 动态未来赛事（战队页 upcoming），超出视野的暂不抓详情
     for t in load_falcons_upcoming(True):
         s, e = parse_date_window(t["date_text"], now)
@@ -745,6 +825,52 @@ def build_config(old_events):
         add({"page": t["page"], "zh": ZH_MAP.get(t["page"], t["name"]),
              "short": ZH_MAP.get(t["page"], t["short"]), "tag": "next",
              "tier": t["tier"] or "Unknown", "match": t["name"]}, base)
+
+    # 1.5) 日历自动发现：总表里的赛事页 → 新赛事零手动上站。
+    #      出现次数 >=DISCOVER_MIN_ROWS 才算正式赛事；单轮最多新增
+    #      DISCOVER_LIMIT 个；已在库且未结束的继续刷新（带 _base 让快刷
+    #      视野逻辑生效）；已归档的跳过（由「携带历史归档」补回）。
+    try:
+        portal = load_portal_tournaments(allow_net)
+        reject = load_discover_reject()
+        added = 0
+        for page, cnt in sorted(portal.items(), key=lambda kv: -kv[1]):
+            sid = slug(page)
+            if cnt < DISCOVER_MIN_ROWS or sid in seen or sid in reserved:
+                continue
+            if page in reject:
+                continue                       # 曾被 tier 闸门拒绝过的小型赛
+            old_ev = None
+            for e in old_events:
+                if e.get("id") == sid:
+                    old_ev = e
+                    break
+            if old_ev is not None:
+                if old_ev.get("status") == "done":
+                    continue                        # 已归档，末尾统一补回
+                # 已在库且未结束 → 保持刷新（不占新增名额；_discover 标记沿用，闸门继续生效）
+                add({"page": page, "zh": old_ev.get("name", page),
+                     "short": old_ev.get("short", page), "tag": "next",
+                     "tier": old_ev.get("tier", "Unknown"),
+                     "match": "", "_discover": bool(old_ev.get("_discover"))},
+                    {"start": old_ev.get("start", ""), "end": old_ev.get("end", ""),
+                     "date_text": old_ev.get("date_text", ""),
+                     "tier": old_ev.get("tier", ""), "note": old_ev.get("note", "")})
+                continue
+            if added >= DISCOVER_LIMIT:
+                continue
+            pretty = page.replace("_", " ")
+            short = pretty.split("/")[-1]
+            # match 留空：发现赛事的短名（如 "2026"、"2"）会误撞 data.json 键
+            # 把别赛的 tier/日期错配过来（2026-10-23 实测 Tesla Cup 被错配成 TWC 的 S-Tier）
+            add({"page": page, "zh": ZH_MAP.get(page, pretty),
+                 "short": ZH_MAP.get(page, short), "tag": "next",
+                 "tier": "Unknown", "match": "", "_discover": True})
+            added += 1
+            print(f"[发现] {ZH_MAP.get(page, pretty)}（日历出现 {cnt} 场）"
+                  f"→ 自动纳入赛事中心")
+    except Exception as e:                          # noqa: BLE001
+        print(f"[warn] 日历自动发现失败：{type(e).__name__}: {e}")
 
     # 2) 复活 live：上一轮 event.json 里正在进行、但可能已离开战队页 upcoming
     for ev in old_events:
@@ -802,8 +928,8 @@ def main():
     except Exception:
         pass
 
-    # 自动全体：动态生成赛事清单（战队页 upcoming + 复活 live + 近期常驻 + SEED 兜底）
-    CONFIG = build_config(old_events)
+    # 自动全体：动态生成赛事清单（战队页 upcoming + 日历发现 + 复活 live + 常驻 + SEED）
+    CONFIG = build_config(old_events, allow_net)
 
     events = []
     used_ids = set()
@@ -815,6 +941,9 @@ def main():
         sid = slug(cfg["page"])
         # 已结束 → 直接复用旧数据；快刷模式下更远未来 → 也复用旧数据
         skip_fetch = (known_status.get(sid) == "done")
+        # 日历新发现的赛事：首抓交给 6 小时全量跑，5 分钟快刷不背这个成本
+        if live_only and cfg.get("_discover") and sid not in old_by_id:
+            skip_fetch = True
         if live_only and not skip_fetch:
             s = (cfg.get("_base") or {}).get("start") or ""
             try:
@@ -843,7 +972,8 @@ def main():
             time.sleep(32)
 
         info = cfg.get("_base")
-        if not info:
+        if not info and not cfg.get("_discover"):
+            # 日历发现赛事绝不走这个模糊匹配（短名 "2026"/"2" 会撞上别的赛事键）
             for k, v in base.items():
                 if cfg.get("match") and cfg["match"].lower() in (k or "").lower():
                     info = v
@@ -875,8 +1005,20 @@ def main():
             degraded.append(ev["id"])
             print(f"[PARSE-WARN] {ev['name']}: {'; '.join(warns)}；无旧数据可回补")
             continue
+        # 日历发现的质量闸门：只收 S/A 级赛事，小型赛记入黑名单不再重抓
+        if cfg.get("_discover"):
+            _t = (ev.get("tier") or "").lower()
+            if not any(k in _t for k in ("s-tier", "a-tier", "premier")):
+                rej = load_discover_reject()
+                rej.add(cfg["page"])
+                save_discover_reject(rej)
+                print(f"[放弃] {ev['name']}（tier={ev.get('tier') or 'Unknown'}，"
+                      f"非 S/A 级，已入黑名单）")
+                continue
         events.append(ev)
         used_ids.add(ev["id"])
+        if cfg.get("_discover"):
+            ev["_discover"] = True   # 持久化标记，后续轮次继续受 tier 闸门约束
         n_teams = len(ev["teams"])
         n_br = sum(len(rd["matches"]) for b in ev["brackets"] for rd in b["rounds"])
         print(f"[ok:{src}] {ev['name']:22} 状态={ev['status']:8} 队={n_teams:3} "
@@ -902,9 +1044,20 @@ def main():
 
     # 排序：next 在前、按开赛时间；recent 在后
     events.sort(key=lambda e: (0 if e.get("tag") == "next" else 1, e.get("start") or "9999"))
+    # tag 与 status 对齐：已结束的赛事归入 recent（否则会霸占 featured 位）
+    for ev in events:
+        if ev.get("status") == "done" and ev.get("tag") == "next":
+            ev["tag"] = "recent"
+    # featured：直播中 > 下一站 > 其余第一个。
+    # 旧逻辑取第一个 tag=next——已结束赛事没归档时会霸占该位，
+    # 赛事中心打开就停在「已结束」上（2026-10-23 用户反馈 IEM 北京"看不见"）。
+    featured = (next((e for e in events if e.get("status") == "live"), None)
+                or next((e for e in events if e.get("status") == "upcoming"), None)
+                or next((e for e in events if e.get("tag") == "next"), None)
+                or (events[0] if events else None))
     data = {
         "updated": now.isoformat(timespec="seconds"),
-        "featured": next((e for e in events if e.get("tag") == "next"), None),
+        "featured": featured,
         "events": events,
         "source_note": "赛事分组、分支图与赛程抓取自 Liquipedia（CC BY-SA 3.0）。",
     }

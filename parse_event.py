@@ -587,14 +587,22 @@ def parse_overview(h: str, name: str):
                  r'<div class="infobox-cell-2[^"]*">Location</div>\s*<div[^>]*>(.*?)</div>',
                  r'<div class="infobox-cell-2[^"]*">Venue</div>\s*<div[^>]*>(.*?)</div>',
                  r'<div class="infobox-cell-2[^"]*">Prize Pool</div>\s*<div[^>]*>(.*?)</div>',
-                 r'<div class="infobox-cell-2[^"]*">Teams</div>\s*<div[^>]*>(.*?)</div>'],
-                ["dates", "dates", "location", "venue", "prize", "teams"])
+                 r'<div class="infobox-cell-2[^"]*">Teams</div>\s*<div[^>]*>(.*?)</div>',
+                 r'<div class="infobox-cell-2[^"]*">\s*Liquipedia [tT]ier:?\s*</div>\s*<div[^>]*>(.*?)</div>',
+                 r'>Liquipedia [tT]ier:?</t[dh]>\s*<td[^>]*>(.*?)</td>'],
+                ["dates", "dates", "location", "venue", "prize", "teams", "tier", "tier"])
     if "prize" not in out and prize:
         m = re.search(r'\$[\d,\.]+', _text(prize))
         if m:
             out["prize"] = m.group(0)
     if fmt:
         out["format_raw"] = _text(fmt)[:400]
+    # tier 不一定在 About 小节内（infobox 位置随页面模板漂移），最后整页兜底搜一次
+    if "tier" not in out:
+        m = re.search(r'<div class="infobox-cell-2[^"]*">\s*Liquipedia [tT]ier:?\s*</div>'
+                      r'\s*<div[^>]*>(.*?)</div>', h, re.S)
+        if m:
+            out["tier"] = _text(m.group(1))[:80]
     return out
 
 
