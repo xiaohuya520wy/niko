@@ -942,9 +942,19 @@ def main():
         sid = slug(cfg["page"])
         # 已结束 → 直接复用旧数据；快刷模式下更远未来 → 也复用旧数据
         skip_fetch = (known_status.get(sid) == "done")
-        # 日历新发现的赛事：首抓交给 6 小时全量跑，5 分钟快刷不背这个成本
+        # 快刷模式也抓「新发现且临近开赛/进行中」的法尔孔赛事：新报名赛事 5 分钟内上站，
+        # 不再干等 6 小时全量跑。远未来赛事（>LIVE_ONLY_HORIZON）仍交给下方 horizon 判断跳过，
+        # 由 6h 全量跑收录，避免无谓抓取数月后的稀疏页面。
         if live_only and cfg.get("_discover") and sid not in old_by_id:
-            skip_fetch = True
+            s = (cfg.get("_base") or {}).get("start") or ""
+            _near = False
+            try:
+                if s and (dt.datetime.fromisoformat(s) - now) <= LIVE_ONLY_HORIZON:
+                    _near = True
+            except Exception:                      # noqa: BLE001
+                pass
+            if not _near:
+                skip_fetch = True
         if live_only and not skip_fetch:
             s = (cfg.get("_base") or {}).get("start") or ""
             try:
@@ -1058,9 +1068,25 @@ def main():
         used_ids.add(sid)
         print(f"[携带] {ev.get('name', sid)}（{ev['status']}，历史归档复用）")
 
-    # 本轮无联网抓取且无新增赛事 → 跳过写出，避免空提交（只在全为已结束赛事的休赛期发生）
+    # 休赛期（无联网抓取）也照常写出：把 updated 时间戳刷到当前时刻，
+    # 让页脚「最近更新」每 5 分钟前进一次，证明站点仍在自动同步（不再冻结在数小时前）。
+    # 仅 updated 变化、赛事内容不变；git 增量极小，且前端指纹不含 updated，不会触发无谓重绘。
+    # （refresh.yml 的 push 触发已 paths-ignore event.json，不会因本提交引发再触发死循环。）
     if fetched == 0 and not degraded:
-        print("本轮无联网抓取且无变化，跳过写出 event.json（避免空提交）")
+        if not events:
+            return
+        data = {
+            "updated": now.isoformat(timespec="seconds"),
+            "featured": (next((e for e in events if e.get("status") == "live"), None)
+                        or next((e for e in events if e.get("status") == "upcoming"), None)
+                        or next((e for e in events if e.get("tag") == "next"), None)
+                        or (events[0] if events else None)),
+            "events": events,
+            "source_note": "赛事分组、分支图与赛程抓取自 Liquipedia（CC BY-SA 3.0）。",
+        }
+        OUT_JSON.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")),
+                            encoding="utf-8")
+        print("休赛期：仅刷新 updated 时间戳（无赛事内容变化）")
         return
 
     # 排序：next 在前、按开赛时间；recent 在后
