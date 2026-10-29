@@ -1813,6 +1813,19 @@ function seasonBoardHtml(LIST, YS){
 function liveFixture(){
   const EVS = (((evData && evData()) || {}).events) || [];
   const now = Date.now() / 1000;
+  // ★ 找出「时间上最早的即将开赛赛事」(nextEv)。未开赛的候选比赛只从这个赛事取，
+  //   不让更晚的赛事（如 BLAST Rivals）里一场「已定时间」的比赛抢到首页顶部，
+  //   否则顶部会显示成更晚的赛事而非最新/最近的赛事。例：IEM 北京已官宣但 Liquipedia
+  //   尚未公布具体开赛时间（ts=null），此前 liveFixture 跳过它、却把 BLAST Rivals 的
+  //   定时比赛顶了上去，造成「首页顶部不是最新的 IEM 北京」的问题。
+  //   有直播的比赛（pri:0）不受此限，照常优先显示（用户正在看比赛时不应被换成赛事预告）。
+  let nextEv = null;
+  EVS.forEach(e => {
+    const s = Date.parse(e.start || '');
+    if(Number.isFinite(s) && s / 1000 > now){
+      if(!nextEv || s / 1000 < Date.parse(nextEv.start || '') / 1000) nextEv = e;
+    }
+  });
   const cand = [];
   // 把 schedule（扁平对阵，a/b 是字符串）与 brackets（matchlist/bracket，a/b 是对象）
   // 统一成 {a,b,sa,sb,ts,bo,round,id}，供 hero 渲染直接用。
@@ -1835,7 +1848,11 @@ function liveFixture(){
                  sa: (sa === undefined ? null : sa), sb: (sb === undefined ? null : sb),
                  ts, bo: m.bo || '', round: roundName || m.round || m.stage || '', id: m.id || '' };
     if(isLive(ts)) cand.push({ pri: 0, e, m: nm, ts, playing: true });
-    else if(ts > now) cand.push({ pri: 1, e, m: nm, ts, playing: false });
+    else if(ts > now){
+      // ★ 未开赛比赛：只认 nextEv（最早即将开赛赛事）里的，更晚赛事的不抢首页
+      if(nextEv && e.id !== nextEv.id) return;
+      cand.push({ pri: 1, e, m: nm, ts, playing: false });
+    }
   };
   EVS.forEach(e => {
     (e.schedule || []).forEach(m => collect(e, m, m.round));
