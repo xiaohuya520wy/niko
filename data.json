@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-10-30T07:20:29+00:00"
+    "updated": "2026-10-30T19:08:14+00:00"
   },
   "squad": [
     {
@@ -399,6 +399,25 @@
       "maps": [],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399852/match",
+        "vods": [],
+        "hltv_maps": []
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
+    {
+      "id": "2026-11-02-natus-vincere",
+      "date": "2026-11-02T09:30:00Z",
+      "opponent": "Natus Vincere",
+      "score": "0-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Beijing",
+      "stage": "",
+      "maps": [],
+      "links": {
+        "hltv_match": "",
         "vods": [],
         "hltv_maps": []
       },
@@ -6571,10 +6590,10 @@
     "span": "近一年",
     "from": "2025-09-12",
     "to": "2026-11-11",
-    "matches": 68,
-    "wins": 47,
+    "matches": 69,
+    "wins": 48,
     "losses": 21,
-    "win_rate": 69.1,
-    "events": 17
+    "win_rate": 69.6,
+    "events": 18
   }
 }
