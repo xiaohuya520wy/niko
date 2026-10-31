@@ -1,14 +1,15 @@
 name = "niko-scheduler"
-main = "index.js"
+main = "worker.js"
 compatibility_date = "2024-11-01"
 account_id = "aff61d5c116fb8cab7c657535424d0c1"
 
-# 非敏感配置（仓库可见，无妨）
-[vars]
-GH_OWNER = "xiaohuya520wy"
-GH_REPO = "niko"
-GH_WORKFLOW = "refresh.yml"
+# niko-scheduler 现在直接跑管线（抓 Liquipedia -> 写 NikoData KV），
+# 不再派发 GitHub Actions。KV 与 Pages Function 共用同一 namespace。
+[[kv_namespaces]]
+binding = "NikoData"
+id = "81c9b09644de4ed7bba0c8aca5ded478"
 
-# 每 5 分钟派发一次 refresh.yml（CF 的 cron 比 GitHub 原生 cron 稳得多）
+# 每 5 分钟跑一次：单批只抓 1 页（5 分钟间隔天然满足 Liquipedia 限流），
+# 凑齐所需页后 assemble event.json / data.json 并写回 KV。
 [triggers]
 crons = ["*/5 * * * *"]
