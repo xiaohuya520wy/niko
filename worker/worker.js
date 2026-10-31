@@ -272,15 +272,17 @@ export async function assembleEvent(env, nowDt, oldEvent, oldData, rejectSet) {
     usedIds.add(sid);
   }
 
-  events.sort(
-    (a, b) =>
-      (a.tag === "next" ? 0 : 1) - (b.tag === "next" ? 0 : 1) ||
-      (a.start || "9999") < (b.start || "9999")
-        ? -1
-        : (a.start || "9999") > (b.start || "9999")
-        ? 1
-        : 0
-  );
+  events.sort((a, b) => {
+    // next 赛事优先；同级再按开赛时间升序。
+    // 旧写法 `tagDiff || a.start < b.start ? -1 : ...` 因 || 优先级高于三元，
+    // 会把非 next 排到 next 前（方向写反）。此处显式分两步比较。
+    const ta = a.tag === "next" ? 0 : 1;
+    const tb = b.tag === "next" ? 0 : 1;
+    if (ta !== tb) return ta - tb;
+    const sa = a.start || "9999";
+    const sb = b.start || "9999";
+    return sa < sb ? -1 : sa > sb ? 1 : 0;
+  });
   for (const ev of events)
     if (ev.status === "done" && ev.tag === "next") ev.tag = "recent";
   const featured =
@@ -350,7 +352,7 @@ export async function assembleData(env, nowDt, oldData) {
   const nikoEntry = await getHtml(env, "NiKo");
   if (nikoEntry && nikoEntry.html && data.player) {
     try {
-      PLAYER.refresh(data.player, null);
+      PLAYER.refresh(data.player, PLAYER.parse(nikoEntry.html));
     } catch {
       /* 抓不到就保留旧值 */
     }
