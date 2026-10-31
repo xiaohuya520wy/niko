@@ -1111,10 +1111,6 @@ let EV_FRESH = null;
 function evData(){ return EV_FRESH || EV; }
 async function pullEvent(){
   const urls = [['/gh/event.json', 'CF 实时']];
-  if(REPO && REPO !== '__REPO__'){
-    urls.push(['https://cdn.jsdelivr.net/gh/' + REPO + '@main/event.json', 'jsDelivr']);
-    urls.push(['https://raw.githubusercontent.com/' + REPO + '/main/event.json', 'GitHub 直连']);
-  }
   urls.push(['./event.json', '同源']);
   for(const [u, tag] of urls){
     try{
@@ -1183,10 +1179,6 @@ let PH_FRESH = null;
 function photosData(){ return PH_FRESH || PH || []; }
 async function pullPhotos(){
   const urls = [['/gh/photos.json', 'CF 实时']];
-  if(REPO && REPO !== '__REPO__'){
-    urls.push(['https://cdn.jsdelivr.net/gh/' + REPO + '@main/photos.json', 'jsDelivr']);
-    urls.push(['https://raw.githubusercontent.com/' + REPO + '/main/photos.json', 'GitHub 直连']);
-  }
   urls.push(['./photos.json', '同源']);
   for(const [u, tag] of urls){
     try{
@@ -1428,10 +1420,6 @@ function dataScore(d){
 }
 async function pullNewest(){
   const urls = [['/gh/data.json', 'CF 实时']];
-  if(REPO && REPO !== '__REPO__'){
-    urls.push(['https://cdn.jsdelivr.net/gh/' + REPO + '@main/data.json', 'jsDelivr']);
-    urls.push(['https://raw.githubusercontent.com/' + REPO + '/main/data.json', 'GitHub 直连']);
-  }
   urls.push(['./data.json', '同源']);
   const floor = dataScore(D) * 0.75;        // 容忍小幅修正，拒绝断崖式缺失
   const got = await Promise.all(urls.map(async ([u, tag]) => {
@@ -2242,7 +2230,7 @@ async function boot(){
     if(!r) return;                       // 联网失败就保留上次数据，下轮再试
     EV_FRESH = r.data;
     const fp = eventFingerprint(r.data);
-    if(fp !== _evFp){ _evFp = fp; render(); fx(); }
+    if(fp !== _evFp){ _evFp = fp; render(); if(typeof fx === 'function') fx(); }
   };
   evSync();
   setInterval(evSync, 60000);
@@ -2251,7 +2239,7 @@ async function boot(){
      旧实现只拉一次、不轮询，导致照片模块打开后永远停在旧快照
      （与「每个模块都要自动更新」的要求不符，2026-10-16 补）。 */
   const photoTick = () => pullPhotos().then(tag => {
-    if(tag){ render(); fx(); if(st) st.textContent = '● 照片已更新（' + tag + '）'; }
+    if(tag){ render(); if(typeof fx === 'function') fx(); if(st) st.textContent = '● 照片已更新（' + tag + '）'; }
   });
   photoTick();
   setInterval(photoTick, 120000);
@@ -2293,6 +2281,7 @@ function fromRecent(m){
 
 /* 数据源 B：event.json 的赛事对阵（通用两队伍视角，兼容 bracket 与 schedule 两种结构） */
 function evMatchToR(m, ev){
+  const _ts = matchTs(m);
   let an, bn, ascore, bscore, awin, bwin;
   if(typeof m.a === 'string'){
     an = m.a; bn = m.b; ascore = m.sa; bscore = m.sb;
@@ -2316,8 +2305,8 @@ function evMatchToR(m, ev){
     a:{name: an, score: ascore, win: awin},
     b:{name: bn, score: bscore, win: bwin},
     scoreText, bo: m.bo, event: ev.name, stage: (m.stage||''),
-    dateText: m.ts ? tsToDate(m.ts) : '',
-    ts: m.ts || null,
+    dateText: _ts ? tsToDate(_ts) : '',
+    ts: _ts || null,
     maps, links: m.links||{}, niko: null, isNiko: isN
   };
 }
@@ -2747,7 +2736,7 @@ async function boot(){
   setInterval(() => sync(st), 60000);   // 选手页也每 60 秒同步远端数据（与首页/赛事页一致），避免打开后一直停在旧快照
   /* 照片墙自动刷新（每 2 分钟轮询）：选手页头图来自照片墙，必须随远端更新
      （2026-10-16 补，与首页一致）。 */
-  const photoTick = () => pullPhotos().then(tag => { if(tag){ render(); fx(); } });
+  const photoTick = () => pullPhotos().then(tag => { if(tag){ render(); if(typeof fx === 'function') fx(); } });
   setInterval(photoTick, 120000);
 }
 """
@@ -3111,10 +3100,7 @@ def build_page(fname, pid, title, js, desc):
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="dns-prefetch" href="https://raw.githubusercontent.com">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="manifest" href="manifest.json"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>{CSS}</style>
@@ -3181,10 +3167,7 @@ def main():
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="dns-prefetch" href="https://raw.githubusercontent.com">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="manifest" href="manifest.json"><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>{CSS}</style>
