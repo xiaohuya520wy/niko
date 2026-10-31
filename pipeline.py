@@ -59,6 +59,11 @@ def build_matches(pages):
             fi = 0 if "Falcons" in m["left"] else 1
             opp = (m["right"] if fi == 0 else m["left"]).replace("Team ", "")
             fs, os_ = m["score"][fi], m["score"][1 - fi]
+            # 只统计已完赛：排除未来对阵与 0-0 占位（未开赛）。
+            # 未开赛 left_win=False，Falcons 在右会被误判成 W（2026-10-31 线上实证）。
+            now_ts = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+            if m["ts"] > now_ts or (fs == 0 and os_ == 0):
+                continue
             maps_out = []
             for mp in m["maps"]:
                 l, r = (mp["left"], mp["right"]) if fi == 0 else (mp["right"], mp["left"])
