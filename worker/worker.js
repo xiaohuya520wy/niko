@@ -70,10 +70,21 @@ function kvPut(env, key, obj) {
 function htmlKey(page) {
   return "html:" + encodeURIComponent(page);
 }
+const META_KEY = "html_meta"; // 轻量年龄索引：page -> 写入时间戳。避免每次 cron 逐个读取 html:* 来算新鲜度。
 function getHtml(env, page) {
   return kvGet(env, htmlKey(page));
 }
-function putHtml(env, page, html) {
+async function getMeta(env) {
+  const m = await kvGet(env, META_KEY);
+  return m && typeof m === "object" ? m : {};
+}
+function ageFromMeta(meta, page, now) {
+  const ts = meta[page];
+  if (!ts) return Infinity;
+  return (now - ts) / 3600000;
+}
+async function putHtml(env, page, html) {
+  // 只写 html:*；年龄索引(html_meta)由 runTick 统一维护，避免并发 rmw 互相覆盖。
   return kvPut(env, htmlKey(page), { html, ts: Date.now() });
 }
 
@@ -502,6 +513,24 @@ export async function runTick(env) {
   const rejectArr = (await kvGet(env, "reject")) || [];
   const rejectSet = new Set(rejectArr);
 
+  // 轻量年龄索引：page -> 写入时间戳（存于 KV 的 html_meta）。用它算页面新鲜度，
+  // 避免每次 cron 为判定「哪些页该刷新」而逐个读取 html:*（旧逻辑每轮 ~100 次 KV 读）。
+  const meta = await getMeta(env);
+  let metaDirty = false; // 本 tick 是否改动了 meta，仅在改动时才回写 KV
+  const htmlCache = {}; // 本 tick 内复用 getHtml 结果（meta 缺失时的兜底）
+  const ageOf = async (page) => {
+    if (page in meta) return ageFromMeta(meta, page, now);
+    // meta 缺失（首次运行/新增页）：兜底读一次 html:*，并把年龄顺带回填进 meta，
+    // 使下一轮 tick 直接走廉价路径（稳态下 metaDirty=false，不再回写）。
+    if (!(page in htmlCache)) htmlCache[page] = await getHtml(env, page);
+    const ts = htmlCache[page] && htmlCache[page].ts;
+    if (ts) {
+      meta[page] = ts;
+      metaDirty = true;
+    }
+    return ageHours(htmlCache[page], now);
+  };
+
   // 计算所需页集合
   const matchPages = [...new Set([...pagesFromEvents(oldEvent), ...PAGES])];
   const needed = new Set([...SPECIAL, ...matchPages]);
@@ -540,13 +569,12 @@ export async function runTick(env) {
   const priority = new Set(SPECIAL);
   const cands = [];
   for (const p of needed) {
-    const entry = await getHtml(env, p);
-    const age = ageHours(entry, now);
+    const age = await ageOf(p); // meta 优先；meta 缺失时兜底读一次 html:*
     const live = livePages.has(p);
     let score, need;
-    if (!entry) {
+    if (!(p in meta)) {
       score = priority.has(p) ? 1e12 : 1e9;
-      need = true;
+      need = true; // meta 里没有 = 尚未抓过，必须先抓
     } else if (live && age > EVENT_MAX_AGE_LIVE_HOURS) {
       score = 1e15;
       need = true;
@@ -567,6 +595,8 @@ export async function runTick(env) {
     try {
       const html = await fetchLiquipedia(c.p);
       await putHtml(env, c.p, html);
+      meta[c.p] = Date.now();
+      metaDirty = true;
       if (!fetchedPage) fetchedPage = c.p;
       picked++;
     } catch (e) {
@@ -576,9 +606,9 @@ export async function runTick(env) {
 
   // 判定是否可 assemble
   const falconsFresh =
-    falconsEntry && ageHours(falconsEntry, now) <= ASSEMBLE_MAX_AGE_HOURS;
+    !!falconsEntry && (await ageOf("Team Falcons")) <= ASSEMBLE_MAX_AGE_HOURS;
   const portalFresh =
-    portalEntry && ageHours(portalEntry, now) <= ASSEMBLE_MAX_AGE_HOURS;
+    !!portalEntry && (await ageOf("Liquipedia:Matches")) <= ASSEMBLE_MAX_AGE_HOURS;
 
   let eventResult = { ok: false, reason: "未达 assemble 条件" };
   if (falconsFresh && portalFresh) {
@@ -593,8 +623,7 @@ export async function runTick(env) {
     // 严格判定：每个 eventPage 都需有缓存且在宽限内
     let ready = true;
     for (const p of eventPages) {
-      const en = await getHtml(env, p);
-      if (ageHours(en, now) > ASSEMBLE_MAX_AGE_HOURS) {
+      if ((await ageOf(p)) > ASSEMBLE_MAX_AGE_HOURS) {
         ready = false;
         break;
       }
@@ -614,15 +643,13 @@ export async function runTick(env) {
   {
     let ready = true;
     for (const p of matchPages) {
-      const en = await getHtml(env, p);
-      if (ageHours(en, now) > ASSEMBLE_MAX_AGE_HOURS) {
+      if ((await ageOf(p)) > ASSEMBLE_MAX_AGE_HOURS) {
         ready = false;
         break;
       }
     }
     const nikoFresh =
-      (await getHtml(env, "NiKo")) &&
-      ageHours(await getHtml(env, "NiKo"), now) <= ASSEMBLE_MAX_AGE_HOURS;
+      (await ageOf("NiKo")) <= ASSEMBLE_MAX_AGE_HOURS;
     if (ready && nikoFresh) {
       dataResult = await assembleData(env, nowDt, oldData);
     }
@@ -641,6 +668,15 @@ export async function runTick(env) {
       ratingResult.ok = true;
     } catch (e) {
       ratingResult = { ok: false, reason: String(e) };
+    }
+  }
+
+  // 仅在 meta 有改动时回写（首次引导/页面抓取后），稳态零开销。
+  if (metaDirty) {
+    try {
+      await kvPut(env, META_KEY, meta);
+    } catch {
+      /* meta 回写失败不影响主流程 */
     }
   }
 
