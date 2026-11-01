@@ -53,10 +53,11 @@ export async function onRequest(context) {
       status: 200,
       headers: {
         "content-type": "application/json; charset=utf-8",
-        // 边缘缓存 120 秒：Worker 每 5 分钟才刷新一次 KV，120s 缓存绝不会比数据更新
-        // 周期更旧，却能把 KV 回源压到 ~1/12（前端每 60s 轮询且 fetch 用 no-store，
-        // 旧值 10s 会导致每个轮询都击穿到 KV，单常开标签页即可打满免费 10 万次/日额度）。
-        "cache-control": "public, max-age=120, s-maxage=120",
+        // 边缘缓存 180 秒：Worker 每 5 分钟才刷新一次 KV，180s 缓存绝不会比数据更新
+        // 周期更旧，却能把 KV 回源再压一档（前端每 60s 轮询且 fetch 用 no-store，
+        // 旧值 10s 会导致每个轮询都击穿到 KV，单常开标签页即可打满免费 10 万次/日额度；
+        // 实测 120s 已把 niko-data 从 ~29k/日 降到 ~2-13k/日，180s 再多留约 50% 余量）。
+        "cache-control": "public, max-age=180, s-maxage=180",
         "access-control-allow-origin": "*",
         "x-niko-source": "cloudflare-kv",
       },
