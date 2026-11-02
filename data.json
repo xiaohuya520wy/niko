@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-02T13:35:33+00:00"
+    "updated": "2026-11-02T19:21:21+00:00"
   },
   "squad": [
     {
@@ -391,8 +391,8 @@
       "id": "2026-11-02-natus-vincere",
       "date": "2026-11-02T11:45:00Z",
       "opponent": "Natus Vincere",
-      "score": "0-1",
-      "result": "W",
+      "score": "0-2",
+      "result": "L",
       "bo": "Bo3",
       "event": "Beijing",
       "stage": "",
@@ -415,21 +415,21 @@
         {
           "map": "Mirage",
           "vetoed": false,
-          "falcons_win": true,
+          "falcons_win": false,
           "falcons": {
-            "rounds": "6",
+            "rounds": "11",
             "t": "6",
-            "ct": ""
+            "ct": "5"
           },
           "opponent": {
-            "rounds": "6",
-            "t": "",
+            "rounds": "13",
+            "t": "7",
             "ct": "6"
           }
         },
         {
           "map": "Anubis",
-          "vetoed": false,
+          "vetoed": true,
           "falcons_win": true,
           "falcons": {
             "rounds": "",
@@ -445,11 +445,24 @@
       ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399858/match",
-        "vods": [],
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/jGjLsrSWvgc?t=39"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/jGjLsrSWvgc?t=2395"
+          }
+        ],
         "hltv_maps": [
           {
             "game": 1,
             "url": "https://www.hltv.org/?pageid=188&matchid=243506"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243510"
           }
         ]
       },
@@ -6623,9 +6636,9 @@
     "from": "2025-09-12",
     "to": "2026-11-02",
     "matches": 68,
-    "wins": 47,
-    "losses": 21,
-    "win_rate": 69.1,
+    "wins": 46,
+    "losses": 22,
+    "win_rate": 67.6,
     "events": 17
   }
 }
