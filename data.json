@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-02T07:52:27+00:00"
+    "updated": "2026-11-02T13:35:33+00:00"
   },
   "squad": [
     {
@@ -387,6 +387,76 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-02-natus-vincere",
+      "date": "2026-11-02T11:45:00Z",
+      "opponent": "Natus Vincere",
+      "score": "0-1",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Beijing",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Ancient",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "5",
+            "t": "0",
+            "ct": "5"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "6",
+            "t": "6",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "6",
+            "t": "",
+            "ct": "6"
+          }
+        },
+        {
+          "map": "Anubis",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2399858/match",
+        "vods": [],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243506"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-10-18-aurora-gaming",
       "date": "2026-10-18T11:30:00Z",
@@ -6551,11 +6621,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-10-18",
-    "matches": 67,
-    "wins": 46,
+    "to": "2026-11-02",
+    "matches": 68,
+    "wins": 47,
     "losses": 21,
-    "win_rate": 68.7,
-    "events": 16
+    "win_rate": 69.1,
+    "events": 17
   }
 }
