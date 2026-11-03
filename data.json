@@ -77,9 +77,9 @@
       "page": "Intel Extreme Masters/2026/Beijing",
       "tier": "S-Tier",
       "date_text": "Nov 02–08",
-      "start": "2026-11-02T00:00:00+00:00",
-      "end": "2026-11-08T23:59:59+00:00",
-      "status": "live",
+      "start": "2027-11-02T00:00:00+00:00",
+      "end": "2027-11-08T23:59:59+00:00",
+      "status": "upcoming",
       "url": "https://liquipedia.net/counterstrike/Intel%20Extreme%20Masters/2026/Beijing"
     },
     {
@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-02T19:21:21+00:00"
+    "updated": "2026-11-03T01:30:14+00:00"
   },
   "squad": [
     {
