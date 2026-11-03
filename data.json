@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-03T07:38:41+00:00"
+    "updated": "2026-11-03T13:30:15+00:00"
   },
   "squad": [
     {
@@ -387,6 +387,97 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-03-faze-clan",
+      "date": "2026-11-03T07:00:00Z",
+      "opponent": "FaZe Clan",
+      "score": "2-1",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Beijing",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Ancient",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "3",
+            "ct": "10"
+          },
+          "opponent": {
+            "rounds": "3",
+            "t": "2",
+            "ct": "1"
+          }
+        },
+        {
+          "map": "Anubis",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "10",
+            "t": "5",
+            "ct": "5"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          },
+          "opponent": {
+            "rounds": "7",
+            "t": "6",
+            "ct": "1"
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2399994/match",
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/iCRPFlmBlY8?t=33"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/iCRPFlmBlY8?t=2028"
+          },
+          {
+            "game": 3,
+            "url": "https://youtu.be/iCRPFlmBlY8?t=5249"
+          }
+        ],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243539"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243542"
+          },
+          {
+            "game": 3,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243544"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-11-02-natus-vincere",
       "date": "2026-11-02T11:45:00Z",
@@ -6639,11 +6730,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-02",
-    "matches": 68,
-    "wins": 46,
+    "to": "2026-11-03",
+    "matches": 69,
+    "wins": 47,
     "losses": 22,
-    "win_rate": 67.6,
+    "win_rate": 68.1,
     "events": 17
   }
 }
