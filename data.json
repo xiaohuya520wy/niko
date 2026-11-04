@@ -120,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-04T01:32:28+00:00"
+    "updated": "2026-11-04T07:43:30+00:00"
   },
   "squad": [
     {
@@ -387,6 +387,89 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-04-heroic",
+      "date": "2026-11-04T04:35:00Z",
+      "opponent": "HEROIC",
+      "score": "2-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Beijing",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Ancient",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "6",
+            "ct": "7"
+          },
+          "opponent": {
+            "rounds": "8",
+            "t": "5",
+            "ct": "3"
+          }
+        },
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          },
+          "opponent": {
+            "rounds": "6",
+            "t": "1",
+            "ct": "5"
+          }
+        },
+        {
+          "map": "Inferno",
+          "vetoed": true,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2400000/match",
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/i8usPC1Ak8I"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/i8usPC1Ak8I?t=2885"
+          }
+        ],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243620"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243621"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-11-03-faze-clan",
       "date": "2026-11-03T07:00:00Z",
@@ -6736,11 +6819,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-03",
-    "matches": 69,
-    "wins": 47,
+    "to": "2026-11-04",
+    "matches": 70,
+    "wins": 48,
     "losses": 22,
-    "win_rate": 68.1,
+    "win_rate": 68.6,
     "events": 17
   }
 }
