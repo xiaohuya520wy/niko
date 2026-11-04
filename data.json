@@ -37,7 +37,7 @@
     "born": "1997 年 2 月 16 日",
     "years_active": "2009 年至今",
     "status": "现役",
-    "winnings": "$2,018,746",
+    "winnings": "$2,020,146",
     "role_liq": "突破位",
     "gear": {
       "mouse": "Razer DeathAdder V3 Pro",
@@ -70,18 +70,6 @@
   },
   "next_match": null,
   "upcoming_tournaments": [
-    {
-      "name": "IEM Beijing 2026",
-      "short": "IEM 北京 2026",
-      "zh": "IEM 北京 2026",
-      "page": "Intel Extreme Masters/2026/Beijing",
-      "tier": "S-Tier",
-      "date_text": "Nov 02–08",
-      "start": "2027-11-02T00:00:00+00:00",
-      "end": "2027-11-08T23:59:59+00:00",
-      "status": "upcoming",
-      "url": "https://liquipedia.net/counterstrike/Intel%20Extreme%20Masters/2026/Beijing"
-    },
     {
       "name": "BLAST Rivals Fall 2026",
       "short": "BLAST Rivals Fall 2026",
@@ -120,7 +108,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-04T07:43:30+00:00"
+    "updated": "2026-11-04T13:32:02+00:00"
   },
   "squad": [
     {
@@ -387,6 +375,84 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-04-natus-vincere",
+      "date": "2026-11-04T10:20:00Z",
+      "opponent": "Natus Vincere",
+      "score": "1-2",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "Beijing",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Ancient",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "6",
+            "ct": "7"
+          },
+          "opponent": {
+            "rounds": "11",
+            "t": "5",
+            "ct": "6"
+          }
+        },
+        {
+          "map": "Inferno",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "4",
+            "t": "3",
+            "ct": "1"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "4",
+            "ct": "9"
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "3",
+            "t": "3",
+            "ct": "0"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "12",
+            "ct": "1"
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2400004/match",
+        "vods": [],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243633"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243635"
+          },
+          {
+            "game": 3,
+            "url": "https://www.hltv.org/?pageid=188&matchid=243640"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-11-04-heroic",
       "date": "2026-11-04T04:35:00Z",
@@ -6825,10 +6891,10 @@
     "span": "近一年",
     "from": "2025-09-12",
     "to": "2026-11-04",
-    "matches": 70,
+    "matches": 71,
     "wins": 48,
-    "losses": 22,
-    "win_rate": 68.6,
+    "losses": 23,
+    "win_rate": 67.6,
     "events": 17
   }
 }
