@@ -108,7 +108,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-04T13:32:02+00:00"
+    "updated": "2026-11-04T19:24:29+00:00"
   },
   "squad": [
     {
@@ -433,7 +433,20 @@
       ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2400004/match",
-        "vods": [],
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/O1bVHYEiggI?t=28"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/O1bVHYEiggI?t=3291"
+          },
+          {
+            "game": 3,
+            "url": "https://youtu.be/O1bVHYEiggI?t=5665"
+          }
+        ],
         "hltv_maps": [
           {
             "game": 1,
