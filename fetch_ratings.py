@@ -172,6 +172,9 @@ def try_backfill(dry=False, use_stealth=True, max_req=40):
     store = load_store()
     entries = store.setdefault("entries", [])
     got, fail_streak, state = 0, 0, {}
+    # 提前中止必须用标志位，不能 return：函数末尾有 git->KV 推送，
+    # 旧写法在「CF 连续挑战 / 达上限」时直接 return，已写入本地的评分永远推不到线上。
+    stop = False
     for t in todo:
         per_map = []
         ok_all = True
@@ -186,10 +189,12 @@ def try_backfill(dry=False, use_stealth=True, max_req=40):
                 continue
             if fail_streak >= 2:
                 print("  连续被 CF 挑战，本次停止（下次运行会继续尝试）")
-                return
+                stop = True
+                break
             if got >= max_req:
                 print(f"  已达本次上限 {max_req} 图，剩余下次再补")
-                return
+                stop = True
+                break
             try:
                 html = fetch(u, use_stealth=use_stealth, state=state)
             except Exception as e:
@@ -215,6 +220,8 @@ def try_backfill(dry=False, use_stealth=True, max_req=40):
                 print(f"  mapstatsid={mid} 未找到 NiKo 行")
                 ok_all = False
             time.sleep(2.5)
+        if stop:
+            break
         if ok_all and per_map:
             entries.append({
                 "date": t["date"],
@@ -228,6 +235,15 @@ def try_backfill(dry=False, use_stealth=True, max_req=40):
             STORE.write_text(json.dumps(store, ensure_ascii=False, indent=1),
                              encoding="utf-8")
     print(f"本次回补 {got} 图")
+    # 接上 git -> KV 桥：本地回补完评分，立刻推到 KV，Worker 下一轮 assemble 自动并入
+    # data.json / history.json（约 5 分钟内线上可见），不必再手动跑 cf_deploy。
+    if got:
+        try:
+            sys.path.insert(0, str(ROOT))
+            import kv_push
+            kv_push.push_ratings()
+        except Exception as e:  # noqa: BLE001
+            print(f"[warn] 评分已写本地，但推送到 KV 失败：{e}（稍后跑 python kv_push.py 补救）")
 
 
 def report():
