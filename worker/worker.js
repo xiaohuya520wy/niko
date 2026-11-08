@@ -315,8 +315,19 @@ export async function assembleEvent(env, nowDt, oldEvent, oldData, rejectSet) {
   if (newN === 0 || newN < oldN) {
     return { ok: false, reason: `赛事数骤降 ${oldN}->${newN}，保留旧数据` };
   }
-  await kvPut(env, "event.json", data);
-  await kvPut(env, "reject", [...rejectSet]);
+  // 省 KV 写额度（免费 1000 次/日）：旧逻辑每轮无条件写 event.json + reject，
+  // 288 轮/日 ≈ 900+ 次写，正好顶满额度，导致 kv_push 评分推送被 429 挡。
+  // 改为「内容无变化就跳过」（忽略每轮都会变的 updated 时间戳）。
+  const oldStrip = { ...(oldEvent || {}) }; delete oldStrip.updated;
+  const newStrip = { ...data }; delete newStrip.updated;
+  if (JSON.stringify(newStrip) !== JSON.stringify(oldStrip)) {
+    await kvPut(env, "event.json", data);
+  }
+  const newReject = [...rejectSet].sort();
+  const oldReject = ((await kvGet(env, "reject")) || []).slice().sort();
+  if (JSON.stringify(newReject) !== JSON.stringify(oldReject)) {
+    await kvPut(env, "reject", newReject);
+  }
   return { ok: true, events: newN, degraded, fetched };
 }
 
@@ -378,6 +389,12 @@ export async function assembleData(env, nowDt, oldData) {
   if (newN === 0 || (oldN && newN < oldN * MIN_KEEP)) {
     return { ok: false, reason: `比赛数骤降 ${oldN}->${newN}，保留旧数据` };
   }
+  // 省 KV 写额度（免费 1000 次/日很紧张，要为评分推送留余量）：
+  // 只比「实质性内容」（忽略 meta.updated 时间戳），完全相同则跳过整次写入与历史合并。
+  const stripMeta = (d) => { const c = { ...(d || {}) }; delete c.meta; return c; };
+  if (oldData && JSON.stringify(stripMeta(data)) === JSON.stringify(stripMeta(oldData))) {
+    return { ok: true, matches: newN, historyRated: 0, unchanged: true };
+  }
   await kvPut(env, "data.json", data);
 
   // ★ 历史赛事（history.json / 选手页）同步合并评分：只读改写，绝不改动比赛数据本身。
@@ -386,6 +403,7 @@ export async function assembleData(env, nowDt, oldData) {
   try {
     const hist = await kvGet(env, "history.json");
     if (Array.isArray(hist) && ratingsEntries.length) {
+      const histBefore = JSON.stringify(hist);
       const store = PL.loadRatingsStore(base, ratingsEntries);
       for (const m of hist) {
         const src = PL.matchRatings(store, (m.date || "").slice(0, 10), m.opponent);
@@ -394,7 +412,10 @@ export async function assembleData(env, nowDt, oldData) {
         if (niko.ratings.length) historyRated++;
         m.niko = niko;
       }
-      await kvPut(env, "history.json", hist);
+      // 省写额度：历史评分无变化时不重写 history.json
+      if (JSON.stringify(hist) !== histBefore) {
+        await kvPut(env, "history.json", hist);
+      }
     }
   } catch {
     /* 历史合并失败不影响主流程 */
@@ -629,13 +650,20 @@ export async function runTick(env) {
       }
     }
     if (ready) {
-      eventResult = await assembleEvent(
-        env,
-        nowDt,
-        oldEvent,
-        oldData,
-        rejectSet
-      );
+      // 单次 KV 写失败（最典型：免费写额度耗尽 429）不得让整轮 tick 冒泡成 fatal，
+      // 否则 assembleData / 评分回补 / html_meta 回写 / 正常心跳全被跳过，
+      // 当轮 last_tick 只剩一条 fatal，站点数据整轮冻结。
+      try {
+        eventResult = await assembleEvent(
+          env,
+          nowDt,
+          oldEvent,
+          oldData,
+          rejectSet
+        );
+      } catch (e) {
+        eventResult = { ok: false, reason: `assembleEvent: ${String(e)}` };
+      }
     }
   }
 
@@ -651,7 +679,11 @@ export async function runTick(env) {
     const nikoFresh =
       (await ageOf("NiKo")) <= ASSEMBLE_MAX_AGE_HOURS;
     if (ready && nikoFresh) {
-      dataResult = await assembleData(env, nowDt, oldData);
+      try {
+        dataResult = await assembleData(env, nowDt, oldData);
+      } catch (e) {
+        dataResult = { ok: false, reason: `assembleData: ${String(e)}` };
+      }
     }
   }
 
