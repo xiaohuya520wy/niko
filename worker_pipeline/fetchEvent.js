@@ -456,7 +456,17 @@ export function parseDateWindow(dateText, now) {
       mo2 = mo1;
     }
   } else { mo2 = mo1; d2 = d1; }
-  const y1 = (mo1 > now.getUTCMonth() + 1 || (mo1 === now.getUTCMonth() + 1 && d1 >= now.getUTCDate())) ? now.getUTCFullYear() : now.getUTCFullYear() + 1;
+  // 年份推断必须用「窗口结束日」而非开始日：赛事进行中（开始日已过、结束日未到）
+  // 仍属当年。旧逻辑只看 d1 >= today，导致 `Nov 02–08` 在 11-08 被推到 2027-11-02，
+  // buildConfig 算 days≈359 > HORIZON 直接丢弃赛事、首页倒计时显示约 359 天
+  // （2026-11-08 实测复现）。跨年窗口（Dec 28–Jan 03）单独按结束日在年初处理。
+  const nowY = now.getUTCFullYear();
+  const nowKey = (now.getUTCMonth() + 1) * 100 + now.getUTCDate();
+  const endKey = mo2 * 100 + d2;
+  const crossesYear = mo2 < mo1;
+  const y1 = crossesYear
+    ? (nowKey <= endKey ? nowY - 1 : nowY)
+    : (endKey >= nowKey ? nowY : nowY + 1);
   const y2 = (mo2 > mo1 || (mo2 === mo1 && d2 >= d1)) ? y1 : y1 + 1;
   try {
     const start = new Date(Date.UTC(y1, mo1 - 1, d1, 0, 0, 0));
