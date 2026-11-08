@@ -1139,12 +1139,16 @@ function eventFingerprint(d){
   for(const e of (d.events || [])){
     const br = (e.brackets || []).map(b => (b.rounds || []).map(rd =>
       (rd.matches || []).map(m => [
-        m.a && m.a.name, m.a && m.a.score, m.b && m.b.name, m.b && m.b.score,
+        m.a && m.a.name, m.a && m.a.score, m.b && m.b.name, m.b && m.b.score, m.ts,
         (m.maps || []).map(x => (x.a && x.a.rounds) + '-' + (x.b && x.b.rounds)).join(',')
       ].join('/')).join(';')).join('~')).join('||');
     const sc = (e.schedule || []).map(m =>
-      [m.a, m.sa, m.b, m.sb].join('/')).join(';');
-    ps.push([e.id, e.status, br, sc].join(':'));
+      [m.a, m.sa, m.b, m.sb, m.ts].join('/')).join(';');
+    const gs = (e.groups || []).map(g =>
+      [g.name, (g.teams || []).map(t => (t && t.name) || t).join(',')].join(':')).join(';');
+    /* 补入 start/end/tag、分组名单与赛程 ts：单纯改期或分组调整时比分与状态都不变，
+       旧指纹判定"无变化"→ 不重渲染，倒计时仍按旧开赛时间跑（2026-11-08 修复）。 */
+    ps.push([e.id, e.status, e.tag, e.start, e.end, e.date_text, br, sc, gs].join(':'));
   }
   return ps.join('|');
 }
@@ -2476,7 +2480,8 @@ async function boot(){
     const r = await pullEvent();              // 实时 event.json
     if(r){
       const fp = eventFingerprint(r.data);
-      if(fp !== _evFp){ _evFp = fp; EV_FRESH = r.data; render(); }
+      EV_FRESH = r.data;   // 无论指纹是否变化都采用最新数据
+      if(fp !== _evFp){ _evFp = fp; render(); }
     }
     const tag = await sync(null);             // data.json：NiKo 视角比赛的逐图评分等
     // render() 之后 #liveStatus 已是新元素，必须重新取，否则往已卸载的节点上写字
@@ -3053,7 +3058,8 @@ async function boot(){
     const r = await pullEvent();
     if(!r) return;              // 联网失败，保留内置/上次数据，下次再试
     const fp = eventFingerprint(r.data);
-    if(fp !== _fp){ _fp = fp; EV_FRESH = r.data; render(); }  // 内容真变了才重渲染（保留滚动位置）
+    EV_FRESH = r.data;   // 无论指纹是否变化都采用最新数据，避免改期时仍用内置旧快照
+    if(fp !== _fp){ _fp = fp; render(); }  // 内容真变了才重渲染（保留滚动位置）
     renderWarnBanner();         // 联网同步后重新评估降级状态
     if(r.data && r.data.updated){
       document.querySelectorAll('.foot').forEach(el => {
