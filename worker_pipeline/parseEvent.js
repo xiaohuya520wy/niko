@@ -484,7 +484,9 @@ export function parseHealth(h, d) {
   h = prep(h);
   const warns = [];
   const realTeams = (seg) => new Set([...seg.matchAll(/<a href="\/counterstrike\/[^"]+" title="(?!TBD)([^"]+)"/g)].map((x) => x[1]));
-  if (!(d.groups || d.brackets || d.schedule)) {
+  // groups/brackets/schedule 恒为数组（[] 也是 truthy），旧写法 `!(a||b||c)` 永远 false，
+  // 导致「页面有积分榜表格但解析结果为空」的改版降级检测从不触发。必须逐个判 .length。
+  if (!(d.groups || []).length && !(d.brackets || []).length && !(d.schedule || []).length) {
     for (const m of h.matchAll(/<table class="[^"]*wikitable[^"]*"[^>]*>(.*?)<\/table>/gs)) {
       if (realTeams(m[1]).size >= 4) { warns.push("page has a standings-like wikitable but groups=0"); break; }
     }
