@@ -35,11 +35,11 @@ QUALITY = 76
 # 第一张是「置顶款」（2026 新队服），pwItems() 会给数组第 0 项打「最新」角标。
 TEAM_PHOTOS = [
     {"src": "assets/photos/falcons_at_ewc_2026.jpg",
-     "caption": "EWC 2026 · 新队服全队合照", "year": 2026, "recent": True},
+     "caption": "EWC 2026 · 新队服全队合照", "year": 2026, "recent": True, "who": "Team"},
     {"src": "assets/photos/falcons_at_blast_rivals_fall_2025.jpg",
-     "caption": "BLAST Rivals Fall 2025 · 全队合照", "year": 2025, "recent": True},
+     "caption": "BLAST Rivals Fall 2025 · 全队合照", "year": 2025, "recent": True, "who": "Team"},
     {"src": "assets/photos/falcons_at_iem_melbourne_2025.jpg",
-     "caption": "IEM Melbourne 2025 · 全队合照", "year": 2025, "recent": True},
+     "caption": "IEM Melbourne 2025 · 全队合照", "year": 2025, "recent": True, "who": "Team"},
 ]
 
 # 缩写 -> 可读名，用于把文件名整理成说明文字
@@ -210,10 +210,34 @@ def main():
     for p in photos:
         p.pop("w", None)
         p.pop("h", None)
-    (ROOT / "photos.json").write_text(
-        json.dumps(photos, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("wrote photos.json:", len(photos), "photos")
-    print("hero (newest):", photos[0]["src"], photos[0]["caption"], photos[0]["year"])
+
+    # 与现有 photos.json 合并（增量，不覆盖）：
+    # 站里还有队友各时期照片与团队合照，是 Liquipedia 各选手页 / 队页人工筛出来的，
+    # 本脚本只抓 NiKo 个人画廊，重跑时绝不能把它们冲掉。
+    store = ROOT / "photos.json"
+    existing = []
+    if store.exists():
+        try:
+            existing = json.loads(store.read_text(encoding="utf-8"))
+        except Exception:
+            existing = []
+    by_src = {p["src"]: p for p in existing}
+    added = 0
+    for p in photos:
+        if p["src"] not in by_src:
+            by_src[p["src"]] = p
+            added += 1
+    # 置顶款固定为 2026 新队服全队合照
+    feat_src = TEAM_PHOTOS[0]["src"]
+    featured = by_src.get(feat_src) or dict(TEAM_PHOTOS[0])
+    rest = [p for p in by_src.values() if p["src"] != feat_src]
+    rest.sort(key=lambda p: (-(p.get("year") or 0),
+                             p.get("who", ""), p.get("caption", "")))
+    final = [featured] + rest
+    store.write_text(json.dumps(final, ensure_ascii=False, indent=1),
+                     encoding="utf-8")
+    print(f"wrote photos.json: {len(final)} photos (本次新增 {added})")
+    print("hero (newest):", final[0]["src"], final[0]["caption"], final[0]["year"])
 
 
 if __name__ == "__main__":
