@@ -3,162 +3,672 @@
   "src": "assets/photos/falcons_at_ewc_2026.jpg",
   "caption": "EWC 2026 · 新队服全队合照",
   "year": 2026,
-  "recent": true
+  "recent": true,
+  "who": "Team"
  },
  {
   "src": "assets/photos/niko_at_blast_open_spring_2026.jpg",
   "caption": "BLAST Open Spring 2026",
   "year": 2026,
+  "recent": true,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/teses_at_blast_open_spring_2026.jpg",
+  "caption": "TeSeS · BLAST Open Spring 2026",
+  "year": 2026,
+  "who": "TeSeS",
   "recent": true
  },
  {
-  "src": "assets/photos/falcons_at_blast_rivals_fall_2025.jpg",
-  "caption": "BLAST Rivals Fall 2025 · 全队合照",
-  "year": 2025,
+  "src": "assets/photos/karrigan_at_pgl_astana_2026.jpg",
+  "caption": "karrigan · PGL Astana 2026",
+  "year": 2026,
+  "who": "karrigan",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/kyousuke_at_blast_open_spring_2026.jpg",
+  "caption": "kyousuke · BLAST Open Spring 2026",
+  "year": 2026,
+  "who": "kyousuke",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/m0nesy_at_blast_bounty_winter_2026.jpg",
+  "caption": "m0NESY · BLAST Bounty Winter 2026",
+  "year": 2026,
+  "who": "m0NESY",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/zonic_at_blast_open_spring_2026.jpg",
+  "caption": "zonic · BLAST Open Spring 2026",
+  "year": 2026,
+  "who": "zonic",
   "recent": true
  },
  {
   "src": "assets/photos/niko_at_iem_katowice_2025.jpg",
   "caption": "IEM Katowice 2025",
   "year": 2025,
+  "recent": true,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/teses_at_pgl_cluj_napoca_2025.jpg",
+  "caption": "TeSeS · PGL Cluj Napoca 2025",
+  "year": 2025,
+  "who": "TeSeS",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/falcons_at_blast_rivals_fall_2025.jpg",
+  "caption": "BLAST Rivals Fall 2025 · 全队合照",
+  "year": 2025,
+  "recent": true,
+  "who": "Team"
+ },
+ {
+  "src": "assets/photos/falcons_at_ewc_2025.jpg",
+  "caption": "Falcons 全队 · EWC 2025",
+  "year": 2025,
+  "who": "Team",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/falcons_at_pgl_bucharest_2025.jpg",
+  "caption": "Falcons 全队 · PGL Bucharest 2025",
+  "year": 2025,
+  "who": "Team",
   "recent": true
  },
  {
   "src": "assets/photos/falcons_at_iem_melbourne_2025.jpg",
   "caption": "IEM Melbourne 2025 · 全队合照",
   "year": 2025,
+  "recent": true,
+  "who": "Team"
+ },
+ {
+  "src": "assets/photos/karrigan_at_pgl_cluj_napoca_2025.jpg",
+  "caption": "karrigan · PGL Cluj Napoca 2025",
+  "year": 2025,
+  "who": "karrigan",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/kyousuke_2025_team_spirit.jpg",
+  "caption": "kyousuke · 2025 Team Spirit",
+  "year": 2025,
+  "who": "kyousuke",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/kyousuke_at_iem_cologne_2025.jpg",
+  "caption": "kyousuke · IEM Cologne 2025",
+  "year": 2025,
+  "who": "kyousuke",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/m0nesy_at_blast_rivals_spring_2025.jpg",
+  "caption": "m0NESY · BLAST Rivals Spring 2025",
+  "year": 2025,
+  "who": "m0NESY",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/m0nesy_at_iem_katowice_2025.jpg",
+  "caption": "m0NESY · IEM Katowice 2025",
+  "year": 2025,
+  "who": "m0NESY",
+  "recent": true
+ },
+ {
+  "src": "assets/photos/zonic_at_pgl_bucharest_2025.jpg",
+  "caption": "zonic · PGL Bucharest 2025",
+  "year": 2025,
+  "who": "zonic",
   "recent": true
  },
  {
   "src": "assets/photos/niko_at_copenhagen_major_2024_eu_rmr.jpg",
   "caption": "Copenhagen Major 欧洲 RMR 2024",
   "year": 2024,
-  "recent": true
+  "recent": true,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/teses_at_iem_katowice_2024.jpg",
+  "caption": "TeSeS · IEM Katowice 2024",
+  "year": 2024,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/teses_at_pgl_major_copenhagen_2024.jpg",
+  "caption": "TeSeS · PGL Major Copenhagen 2024",
+  "year": 2024,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_at_esports_world_cup_2024.jpg",
+  "caption": "karrigan · Esports World Cup 2024",
+  "year": 2024,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/m0nesy_at_iem_katowice_2024.jpg",
+  "caption": "m0NESY · IEM Katowice 2024",
+  "year": 2024,
+  "who": "m0NESY",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_at_esl_challenger_katowice_2024.jpg",
+  "caption": "zonic · ESL Challenger Katowice 2024",
+  "year": 2024,
+  "who": "zonic",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_at_iem_katowice_2024.jpg",
+  "caption": "zonic · IEM Katowice 2024",
+  "year": 2024,
+  "who": "zonic",
+  "recent": false
  },
  {
   "src": "assets/photos/niko_at_iem_cologne_2023.jpg",
   "caption": "IEM Cologne 2023",
   "year": 2023,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/karrigan_at_iem_sydney_2023.jpg",
+  "caption": "karrigan · IEM Sydney 2023",
+  "year": 2023,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/m0nesy_at_blast_paris_major_2023.jpg",
+  "caption": "m0NESY · BLAST Paris Major 2023",
+  "year": 2023,
+  "who": "m0NESY",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_at_blast_paris_major_2023.jpg",
+  "caption": "zonic · BLAST Paris Major 2023",
+  "year": 2023,
+  "who": "zonic",
   "recent": false
  },
  {
   "src": "assets/photos/niko_at_antwerp_major_2022_eu_rmr.jpg",
   "caption": "Antwerp Major 欧洲 RMR 2022",
   "year": 2022,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_at_rio_major_2022_eu_rmr.jpg",
   "caption": "Rio Major 欧洲 RMR 2022",
   "year": 2022,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/teses_at_antwerp_major_2022_eu_rmr.jpg",
+  "caption": "TeSeS · Antwerp Major 2022 EU RMR",
+  "year": 2022,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_at_antwerp_major_2022_eu_rmr.jpg",
+  "caption": "karrigan · Antwerp Major 2022 EU RMR",
+  "year": 2022,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_iem_katowice_2022.jpg",
+  "caption": "karrigan · IEM Katowice 2022",
+  "year": 2022,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/m0nesy_pgl_antwerp_2022_eu_b_rmr.jpg",
+  "caption": "m0NESY · PGL Antwerp 2022 EU B RMR",
+  "year": 2022,
+  "who": "m0NESY",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/m0nesy_at_pgl_major_antwerp_2022.jpg",
+  "caption": "m0NESY · PGL Major Antwerp 2022",
+  "year": 2022,
+  "who": "m0NESY",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_at_antwerp_major_2022_eu_rmr.jpg",
+  "caption": "zonic · Antwerp Major 2022 EU RMR",
+  "year": 2022,
+  "who": "zonic",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_iem_katowice_2022.jpg",
+  "caption": "zonic · IEM Katowice 2022",
+  "year": 2022,
+  "who": "zonic",
   "recent": false
  },
  {
   "src": "assets/photos/niko_iem_cologne_2021.jpg",
   "caption": "IEM Cologne 2021",
   "year": 2021,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/teses_iem_cologne_2021.jpg",
+  "caption": "TeSeS · IEM Cologne 2021",
+  "year": 2021,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/teses_pgl_major_stockholm_2021.jpg",
+  "caption": "TeSeS · PGL Major Stockholm 2021",
+  "year": 2021,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_iem_cologne_2021.jpg",
+  "caption": "karrigan · IEM Cologne 2021",
+  "year": 2021,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_iem_cologne_2021.jpg",
+  "caption": "zonic · IEM Cologne 2021",
+  "year": 2021,
+  "who": "zonic",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_pgl_major_stockholm_2021.jpg",
+  "caption": "zonic · PGL Major Stockholm 2021",
+  "year": 2021,
+  "who": "zonic",
   "recent": false
  },
  {
   "src": "assets/photos/niko_iem_katowice_2020.jpg",
   "caption": "IEM Katowice 2020",
   "year": 2020,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/cphf_teses_2020.jpg",
+  "caption": "TeSeS · 2020",
+  "year": 2020,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_iem_katowice_2020.jpg",
+  "caption": "karrigan · IEM Katowice 2020",
+  "year": 2020,
+  "who": "karrigan",
   "recent": false
  },
  {
   "src": "assets/photos/niko_iem_beijing_2019.jpg",
   "caption": "IEM Beijing 2019",
   "year": 2019,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_iem_katowice_2019.jpg",
   "caption": "IEM Katowice 2019",
   "year": 2019,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/teses_dreamhack_summer_2019.jpg",
+  "caption": "TeSeS · DreamHack Summer 2019",
+  "year": 2019,
+  "who": "TeSeS",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_americas_minor_2019.jpg",
+  "caption": "karrigan · Americas Minor 2019",
+  "year": 2019,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_berlin_minor.jpg",
+  "caption": "karrigan · Berlin Minor 2019",
+  "year": 2019,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_epicenter_2019.jpg",
+  "caption": "karrigan · EPICENTER 2019",
+  "year": 2019,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_iem_sydney_2019.jpg",
+  "caption": "karrigan · IEM Sydney 2019",
+  "year": 2019,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_dhmm_2019.jpg",
+  "caption": "zonic · DHMM 2019",
+  "year": 2019,
+  "who": "zonic",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_epl_s10_finals.jpg",
+  "caption": "zonic · ESL Pro League S10 Finals 2019",
+  "year": 2019,
+  "who": "zonic",
   "recent": false
  },
  {
   "src": "assets/photos/niko_at_dh_masters_stockholm_2018.jpg",
   "caption": "DreamHack Masters Stockholm 2018",
   "year": 2018,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_at_eleague_major_boston_2018.jpg",
   "caption": "ELEAGUE Major Boston 2018",
   "year": 2018,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_at_epicenter_2018.jpg",
   "caption": "EPICENTER 2018",
   "year": 2018,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_iem_sydney_2018.jpg",
   "caption": "IEM Sydney 2018",
   "year": 2018,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/karrigan_at_dh_masters_stockholm_2018.jpg",
+  "caption": "karrigan · DH Masters Stockholm 2018",
+  "year": 2018,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_at_starladder_ileague_starseries_season_4.jpg",
+  "caption": "karrigan · Starladder i-League S4 2018",
+  "year": 2018,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_at_dh_marseille_2018.jpg",
+  "caption": "zonic · DH Marseille 2018",
+  "year": 2018,
+  "who": "zonic",
   "recent": false
  },
  {
   "src": "assets/photos/niko_at_epicenter_2017.jpg",
   "caption": "EPICENTER 2017",
   "year": 2017,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_at_iem_sydney_2017.jpg",
   "caption": "IEM Sydney 2017",
   "year": 2017,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/niko_at_eleague_major_2017.jpg",
+  "caption": "NiKo · ELEAGUE Major 2017",
+  "year": 2017,
+  "who": "NiKo",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_pgl_major_krakow_groups.jpg",
+  "caption": "karrigan · PGL Major Krakow 2017",
+  "year": 2017,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_dreamhack_open_leipzig_2016.jpg",
+  "caption": "karrigan · DreamHack Open Leipzig 2016",
+  "year": 2016,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_at_esl_barcelona_16.jpg",
+  "caption": "karrigan · ESL Barcelona 16 2016",
+  "year": 2016,
+  "who": "karrigan",
   "recent": false
  },
  {
   "src": "assets/photos/niko_at_dh_stockholm_2015.jpg",
   "caption": "DreamHack Stockholm 2015",
   "year": 2015,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_at_eslm_spring_2015_finals.jpg",
   "caption": "ESL Masters Spring 总决赛 2015",
   "year": 2015,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_iem_gamescom_2015.jpg",
   "caption": "IEM Gamescom 2015",
   "year": 2015,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/karrigan_dhcn15.jpg",
+  "caption": "karrigan · DHCN15 2015",
+  "year": 2015,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_dhv15.jpg",
+  "caption": "karrigan · DHV15 2015",
+  "year": 2015,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_dh_stockholm_2015.jpg",
+  "caption": "zonic · DH Stockholm 2015",
+  "year": 2015,
+  "who": "zonic",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_cphg14.jpg",
+  "caption": "karrigan · CPHG14 2014",
+  "year": 2014,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_dhsh14.jpg",
+  "caption": "karrigan · DHSH14 2014",
+  "year": 2014,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_eswc14.jpg",
+  "caption": "karrigan · ESWC14 2014",
+  "year": 2014,
+  "who": "karrigan",
   "recent": false
  },
  {
   "src": "assets/photos/niko_bgf_2013.jpg",
   "caption": "BGF 2013",
   "year": 2013,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/karrigan_emss13.jpg",
+  "caption": "karrigan · EMSS13 2013",
+  "year": 2013,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_dhw12.jpg",
+  "caption": "karrigan · DHW12 2012",
+  "year": 2012,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_gg12.jpg",
+  "caption": "karrigan · GG12 2012",
+  "year": 2012,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_iemk12.jpg",
+  "caption": "karrigan · IEMK12 2012",
+  "year": 2012,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_cphg11.jpg",
+  "caption": "karrigan · CPHG11 2011",
+  "year": 2011,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_eswc11.jpg",
+  "caption": "karrigan · ESWC11 2011",
+  "year": 2011,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/zonic_iem_ny_2011.jpg",
+  "caption": "zonic · IEM NY 2011",
+  "year": 2011,
+  "who": "zonic",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_and_wazorn_wcg_2010.jpg",
+  "caption": "karrigan · and wazorN @ WCG 2010",
+  "year": 2010,
+  "who": "karrigan",
   "recent": false
  },
  {
   "src": "assets/photos/niko_at_dhm_malm.jpg",
   "caption": "DreamHack Masters Malmö",
   "year": 0,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_epl_s4_finals.jpg",
   "caption": "EPL S4 总决赛",
   "year": 0,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_esl_pro_league_season_9_finals.jpg",
   "caption": "ESL Pro League S9 总决赛",
   "year": 0,
-  "recent": false
+  "recent": false,
+  "who": "NiKo"
  },
  {
   "src": "assets/photos/niko_esports_heaven_vienna.jpg",
   "caption": "Esports Heaven Vienna",
   "year": 0,
+  "recent": false,
+  "who": "NiKo"
+ },
+ {
+  "src": "assets/photos/niko_apm_season_2_finals.jpg",
+  "caption": "NiKo · APM Season 2 Finals",
+  "year": 0,
+  "who": "NiKo",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/niko_ts.jpg",
+  "caption": "NiKo · 早期肖像",
+  "year": 0,
+  "who": "NiKo",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/karrigan_fbm_s5_lan_finals.jpg",
+  "caption": "karrigan · FBM S5 LAN Finals",
+  "year": 0,
+  "who": "karrigan",
+  "recent": false
+ },
+ {
+  "src": "assets/photos/m0nesy.jpg",
+  "caption": "m0NESY · 早期肖像",
+  "year": 0,
+  "who": "m0NESY",
   "recent": false
  }
 ]
