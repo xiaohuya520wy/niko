@@ -18,6 +18,7 @@ Worker 下一轮 assemble 自动把新评分并入 data.json / history.json（�
 ----
     python kv_push.py                  # 推送 ratings.json -> KV key "ratings.json"
     python kv_push.py --check          # 只比较本地与 KV 差异，不写入
+    python kv_push.py --file photos.json --key photos.json   # 更新线上照片墙
     python kv_push.py --file foo.json --key bar.json   # 推送任意 JSON 到指定 KV key
 
 令牌优先级：环境变量 CLOUDFLARE_API_TOKEN -> ~/.workbuddy/secrets/cloudflare_token
@@ -95,7 +96,7 @@ def push(path: Path, key: str, token: str, check_only: bool = False) -> bool:
     status = kv_put(key, local, token)
     if status == "QUOTA":
         print(f"[kv] {key}: 今日 KV 写额度已耗尽（免费 1000 次/日，被 Worker 常规写入占用），"
-              f"评分推送延后到明天 UTC 0 点后自动生效（下次跑 fetch_ratings / kv_push 会重试）")
+              f"本次推送延后到明天 UTC 0 点后生效（下次重跑 kv_push 会重试）")
         return False
     print(f"[kv] {key} -> HTTP {status}")
     return status == 200
