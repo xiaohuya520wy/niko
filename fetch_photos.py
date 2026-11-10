@@ -25,10 +25,22 @@ UA = {
     "User-Agent": "NikoTracker/1.0 (personal CS2 fan page; contact: user@example.com)",
     "Accept-Encoding": "gzip",
 }
-PAGE = "Niko"
+PAGE = "NiKo"
 API = "https://liquipedia.net/counterstrike/api.php"
 MAX_EDGE = 880
 QUALITY = 76
+
+# 全队合照 / 新队服照片：NiKo 个人画廊里没有，来自 Liquipedia 的 Team Falcons 队页。
+# 这里写死清单，保证重跑 fetch_photos.py 时不会把团队照从 photos.json 里冲掉。
+# 第一张是「置顶款」（2026 新队服），pwItems() 会给数组第 0 项打「最新」角标。
+TEAM_PHOTOS = [
+    {"src": "assets/photos/falcons_at_ewc_2026.jpg",
+     "caption": "EWC 2026 · 新队服全队合照", "year": 2026, "recent": True},
+    {"src": "assets/photos/falcons_at_blast_rivals_fall_2025.jpg",
+     "caption": "BLAST Rivals Fall 2025 · 全队合照", "year": 2025, "recent": True},
+    {"src": "assets/photos/falcons_at_iem_melbourne_2025.jpg",
+     "caption": "IEM Melbourne 2025 · 全队合照", "year": 2025, "recent": True},
+]
 
 # 缩写 -> 可读名，用于把文件名整理成说明文字
 ABBREV = [
@@ -184,8 +196,17 @@ def main():
                            "year": year or 0, "recent": (year or 0) >= 2024,
                            "w": size[0], "h": size[1]})
         time.sleep(1.2)
+    # 团队照不在个人画廊里，合并进来；2026 新队服合照固定置顶。
+    known = {p["src"] for p in photos}
+    featured, others = TEAM_PHOTOS[0], []
+    for t in TEAM_PHOTOS[1:]:
+        if t["src"] not in known:
+            others.append(dict(t))
+    photos.extend(others)
     # 按年份倒序（新的在前）；同年按 caption
     photos.sort(key=lambda p: (-(p["year"] or 0), p["caption"]))
+    photos = [dict(featured)] + [p for p in photos
+                                 if p["src"] != featured["src"]]
     for p in photos:
         p.pop("w", None)
         p.pop("h", None)
