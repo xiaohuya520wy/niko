@@ -1,10 +1,15 @@
-"""抓取 NiKo 的官方照片，生成可滑动「照片墙」素材。
+"""抓取 NiKo 本人的官方照片，生成可滑动「照片墙」素材。
 
-来源：Liquipedia 选手页画廊（liquipedia.net/counterstrike/Nikola_Kovac）。
+铁律（2026-11-10 用户明确要求）：这是 NiKo 个人站，照片墙里每一张都必须有 NiKo。
+  - 只收 Liquipedia 上以大写 K 的 "NiKo..." 命名的选手本人照片；
+  - 队友单人照、全队合照一律不进 photos.json（队友 2026 新队服照在 assets/players/ 供阵容页使用）；
+  - 小写 "Niko ..." 是另一位戴眼镜的丹麦选手，绝不能混进来；
+  - 历史遗留的 niko_ts.jpg 与 NiKo 不符，列入黑名单。
+来源：Liquipedia 选手页画廊（liquipedia.net/counterstrike/NiKo）。
 产出：
-  assets/photos/<slug>.jpg   每张官方照片（统一压到最长边 <=880px，JPEG q76 渐进式）
-  photos.json                [{src, caption, event, year, recent}] 按年份倒序
-重跑本脚本即可拉取 Liquipedia 新发布的官方照片（"有更新的"）。
+  assets/photos/<slug>.jpg   NiKo 本人照片（统一压到最长边 <=880px，JPEG q76）
+  photos.json                [{src, caption, year, recent, who}] 按年份倒序
+重跑本脚本只会补充 NiKo 新照片，并自动清理任何混进来的非 NiKo 条目。
 """
 import gzip
 import json
@@ -30,16 +35,15 @@ API = "https://liquipedia.net/counterstrike/api.php"
 MAX_EDGE = 880
 QUALITY = 76
 
-# 全队合照 / 新队服照片：NiKo 个人画廊里没有，来自 Liquipedia 的 Team Falcons 队页。
-# 这里写死清单，保证重跑 fetch_photos.py 时不会把团队照从 photos.json 里冲掉。
-# 第一张是「置顶款」（2026 新队服），pwItems() 会给数组第 0 项打「最新」角标。
-TEAM_PHOTOS = [
-    {"src": "assets/photos/falcons_at_ewc_2026.jpg",
-     "caption": "EWC 2026 · 新队服全队合照", "year": 2026, "recent": True, "who": "Team"},
-    {"src": "assets/photos/falcons_at_blast_rivals_fall_2025.jpg",
-     "caption": "BLAST Rivals Fall 2025 · 全队合照", "year": 2025, "recent": True, "who": "Team"},
-    {"src": "assets/photos/falcons_at_iem_melbourne_2025.jpg",
-     "caption": "IEM Melbourne 2025 · 全队合照", "year": 2025, "recent": True, "who": "Team"},
+# 明确不是 NiKo 本人 / 无法确认出镜的文件，重跑时永远剔除。
+# niko_ts.jpg 来源 NiKo TS.png，画面里是另一位黑衣抱臂的选手，与 NiKo 不符。
+BLOCKLIST = {"niko_ts.jpg"}
+
+# 允许的手工补充照片：必须是逐张核验过确实有 NiKo 的，才能加进这个白名单。
+# 目前是 Liquipedia commons 的 "NiKo @ APM Season 2 Finals.jpg"（年轻 NiKo 红衣）。
+MANUAL_NIKO = [
+    {"src": "assets/photos/niko_at_apm_season_2_finals_2.jpg",
+     "caption": "NiKo · APM Season 2 总决赛", "year": 0, "recent": False, "who": "NiKo"},
 ]
 
 # 缩写 -> 可读名，用于把文件名整理成说明文字
@@ -62,9 +66,15 @@ ABBREV = [
 def get_html_cache():
     """画廊只存在于渲染后的完整 HTML，而 API 解析会把画廊剥掉、直接抓文章又被拦。
     因此优先读已缓存的渲染页（_cache/events/NiKo.html）；用它抽取画廊文件标题最稳。"""
-    cache = ROOT / "_cache" / "events" / "NiKo.html"
-    if cache.exists():
-        return cache.read_text(encoding="utf-8", errors="replace")
+    # 缓存实际散落在几个位置，依次找；之前只认 _cache/events 导致重跑时
+    # 静默退化到 API parse（拿不到画廊），照片墙会被清空。
+    for rel in ("_cache/events/NiKo.html",
+                "_verify/photos/NiKo.html",
+                "_verify/photos/NiKo_page.html",
+                "_fixtures/player-niko.html"):
+        cache = ROOT / rel
+        if cache.exists():
+            return cache.read_text(encoding="utf-8", errors="replace")
     # 兜底：缓存缺失时尝试一次 API 解析（可能不含画廊，但至少有信息框图）
     try:
         url = API + "?" + urllib.parse.urlencode(
@@ -79,12 +89,29 @@ def get_html_cache():
         return ""
 
 
+def is_niko_photo(title: str) -> bool:
+    """NiKo 本人照片的硬门槛。
+
+    Liquipedia 上大写 K 的 "NiKo ..." 才是 Nikola Kovač；
+    小写 "Niko ..." 多数是另一位戴眼镜的丹麦选手（另有 "Niko Swedish player"、
+    "Niko (Danish player)"、"MYTH Niko" 等），绝不能进 NiKo 的照片墙。
+    队伍合照/队标（Falcons/G2/Mousesports...）同样不符合「每张必须有 NiKo」。
+    """
+    real = urllib.parse.unquote(title)
+    stem = re.sub(r"\.(jpg|jpeg|png|webp)$", "", real, flags=re.I)
+    if not stem.startswith("NiKo"):
+        return False
+    if slugify(real) + ".jpg" in BLOCKLIST:
+        return False
+    return True
+
+
 def gallery_files(h):
-    """抽取画廊里每个文件标题（去重）。"""
+    """抽取画廊里 NiKo 本人的文件标题（去重，只认 NiKo 前缀）。"""
     titles = []
-    for m in re.finditer(r'href="/counterstrike/File:([^"]+)"', h):
+    for m in re.finditer(r'href="[^"]*File:([^"]+)"', h):
         t = m.group(1)
-        if t.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+        if t.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) and is_niko_photo(t):
             titles.append(t)
     # 去重保序
     seen, uniq = set(), []
@@ -179,41 +206,28 @@ def download(file_title):
 
 
 def main():
-    print("load NiKo gallery (cached render)")
+    print("load NiKo gallery (NiKo-only guard ON)")
     h = get_html_cache()
     files = gallery_files(h)
-    print("gallery photos:", len(files))
-    photos = []
+    print("NiKo gallery photos:", len(files))
+    fresh = []
     for i, f in enumerate(files):
         print(f"  [{i+1}/{len(files)}] {f}")
         res = download(f)
         if res:
             src, _cap, _yr, size = res
+            if pathlib.Path(src).name in BLOCKLIST:
+                continue
             real = urllib.parse.unquote(f)
             event, year = humanize(real)
-            caption = (f"{event} {year}" if year else event).strip()
-            photos.append({"src": src, "caption": caption,
-                           "year": year or 0, "recent": (year or 0) >= 2024,
-                           "w": size[0], "h": size[1]})
+            caption = "NiKo · " + (f"{event} {year}" if year else event).strip()
+            fresh.append({"src": src, "caption": caption,
+                          "year": year or 0, "recent": (year or 0) >= 2024,
+                          "who": "NiKo"})
         time.sleep(1.2)
-    # 团队照不在个人画廊里，合并进来；2026 新队服合照固定置顶。
-    known = {p["src"] for p in photos}
-    featured, others = TEAM_PHOTOS[0], []
-    for t in TEAM_PHOTOS[1:]:
-        if t["src"] not in known:
-            others.append(dict(t))
-    photos.extend(others)
-    # 按年份倒序（新的在前）；同年按 caption
-    photos.sort(key=lambda p: (-(p["year"] or 0), p["caption"]))
-    photos = [dict(featured)] + [p for p in photos
-                                 if p["src"] != featured["src"]]
-    for p in photos:
-        p.pop("w", None)
-        p.pop("h", None)
 
-    # 与现有 photos.json 合并（增量，不覆盖）：
-    # 站里还有队友各时期照片与团队合照，是 Liquipedia 各选手页 / 队页人工筛出来的，
-    # 本脚本只抓 NiKo 个人画廊，重跑时绝不能把它们冲掉。
+    # 与现有 photos.json 合并，但只保留 NiKo 本人：
+    # 队友单人照 / 全队合照 / 任何 who != 'NiKo' 的条目一律剔除（自愈）。
     store = ROOT / "photos.json"
     existing = []
     if store.exists():
@@ -221,22 +235,45 @@ def main():
             existing = json.loads(store.read_text(encoding="utf-8"))
         except Exception:
             existing = []
-    by_src = {p["src"]: p for p in existing}
+    by_src = {}
+    dropped = 0
+    for p in existing:
+        if p.get("who") != "NiKo" or pathlib.Path(p.get("src", "")).name in BLOCKLIST:
+            dropped += 1
+            continue
+        by_src[p["src"]] = p
+    # 逐张人工核验过的补充照片
+    for p in MANUAL_NIKO:
+        if (ROOT / p["src"]).exists():
+            by_src.setdefault(p["src"], dict(p))
     added = 0
-    for p in photos:
+    for p in fresh:
         if p["src"] not in by_src:
-            by_src[p["src"]] = p
             added += 1
-    # 置顶款固定为 2026 新队服全队合照
-    feat_src = TEAM_PHOTOS[0]["src"]
-    featured = by_src.get(feat_src) or dict(TEAM_PHOTOS[0])
-    rest = [p for p in by_src.values() if p["src"] != feat_src]
-    rest.sort(key=lambda p: (-(p.get("year") or 0),
-                             p.get("who", ""), p.get("caption", "")))
-    final = [featured] + rest
+        by_src[p["src"]] = p
+
+    final = list(by_src.values())
+    for p in final:
+        cap = re.sub(r"^NiKo\s*[·・:：]\s*", "", p.get("caption", "")).strip()
+        p["caption"] = "NiKo · " + cap
+        p["who"] = "NiKo"
+        p.pop("w", None)
+        p.pop("h", None)
+    # 年份倒序；同年按说明文字。最新一张作为首图（hero / 「最新」角标）。
+    final.sort(key=lambda p: (-(p.get("year") or 0), p.get("caption", "")))
+
+    # 写盘前的硬断言：任何一张不是 NiKo，就拒绝生成，避免再次污染照片墙。
+    bad = [p["src"] for p in final
+           if p.get("who") != "NiKo"
+           or pathlib.Path(p["src"]).name in BLOCKLIST
+           or not (ROOT / p["src"]).exists()]
+    if bad:
+        raise SystemExit(f"[ABORT] 照片墙存在非 NiKo / 缺失条目：{bad}")
+
     store.write_text(json.dumps(final, ensure_ascii=False, indent=1),
                      encoding="utf-8")
-    print(f"wrote photos.json: {len(final)} photos (本次新增 {added})")
+    print(f"wrote photos.json: {len(final)} 张（全部 NiKo 本人；新增 {added}，"
+          f"清理非 NiKo 条目 {dropped}）")
     print("hero (newest):", final[0]["src"], final[0]["caption"], final[0]["year"])
 
 
