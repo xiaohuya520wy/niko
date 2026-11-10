@@ -1,13 +1,31 @@
 [
  {
+  "src": "assets/photos/falcons_at_ewc_2026.jpg",
+  "caption": "EWC 2026 · 新队服全队合照",
+  "year": 2026,
+  "recent": true
+ },
+ {
   "src": "assets/photos/niko_at_blast_open_spring_2026.jpg",
   "caption": "BLAST Open Spring 2026",
   "year": 2026,
   "recent": true
  },
  {
+  "src": "assets/photos/falcons_at_blast_rivals_fall_2025.jpg",
+  "caption": "BLAST Rivals Fall 2025 · 全队合照",
+  "year": 2025,
+  "recent": true
+ },
+ {
   "src": "assets/photos/niko_at_iem_katowice_2025.jpg",
   "caption": "IEM Katowice 2025",
+  "year": 2025,
+  "recent": true
+ },
+ {
+  "src": "assets/photos/falcons_at_iem_melbourne_2025.jpg",
+  "caption": "IEM Melbourne 2025 · 全队合照",
   "year": 2025,
   "recent": true
  },
