@@ -79,7 +79,7 @@
       "date_text": "Nov 11–15",
       "start": "2026-11-11T00:00:00+00:00",
       "end": "2026-11-15T23:59:59+00:00",
-      "status": "upcoming",
+      "status": "live",
       "url": "https://liquipedia.net/counterstrike/BLAST/Rivals/2026/Fall"
     },
     {
@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-10T23:38:59+00:00"
+    "updated": "2026-11-11T06:38:12+00:00"
   },
   "squad": [
     {
@@ -399,6 +399,76 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-11-vitality",
+      "date": "2026-11-11T04:15:00Z",
+      "opponent": "Vitality",
+      "score": "0-1",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Fall",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Anubis",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "10",
+            "t": "5",
+            "ct": "5"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "6",
+            "ct": "7"
+          }
+        },
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "7",
+            "t": "",
+            "ct": "7"
+          },
+          "opponent": {
+            "rounds": "5",
+            "t": "5",
+            "ct": ""
+          }
+        },
+        {
+          "map": "Inferno",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2399852/match",
+        "vods": [],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244069"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-11-04-natus-vincere",
       "date": "2026-11-04T10:20:00Z",
@@ -6933,11 +7003,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-04",
-    "matches": 71,
-    "wins": 48,
+    "to": "2026-11-11",
+    "matches": 72,
+    "wins": 49,
     "losses": 23,
-    "win_rate": 67.6,
-    "events": 17
+    "win_rate": 68.1,
+    "events": 18
   }
 }
