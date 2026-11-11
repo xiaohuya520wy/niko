@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-11T06:38:12+00:00"
+    "updated": "2026-11-11T19:52:26+00:00"
   },
   "squad": [
     {
@@ -403,8 +403,8 @@
       "id": "2026-11-11-vitality",
       "date": "2026-11-11T04:15:00Z",
       "opponent": "Vitality",
-      "score": "0-1",
-      "result": "W",
+      "score": "0-2",
+      "result": "L",
       "bo": "Bo3",
       "event": "Fall",
       "stage": "",
@@ -427,21 +427,21 @@
         {
           "map": "Dust II",
           "vetoed": false,
-          "falcons_win": true,
+          "falcons_win": false,
           "falcons": {
-            "rounds": "7",
-            "t": "",
+            "rounds": "10",
+            "t": "3",
             "ct": "7"
           },
           "opponent": {
-            "rounds": "5",
+            "rounds": "13",
             "t": "5",
-            "ct": ""
+            "ct": "8"
           }
         },
         {
           "map": "Inferno",
-          "vetoed": false,
+          "vetoed": true,
           "falcons_win": true,
           "falcons": {
             "rounds": "",
@@ -457,11 +457,24 @@
       ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2399852/match",
-        "vods": [],
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/bPEdav9fUks?t=20"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/bPEdav9fUks?t=3362"
+          }
+        ],
         "hltv_maps": [
           {
             "game": 1,
             "url": "https://www.hltv.org/?pageid=188&matchid=244069"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244070"
           }
         ]
       },
@@ -7005,9 +7018,9 @@
     "from": "2025-09-12",
     "to": "2026-11-11",
     "matches": 72,
-    "wins": 49,
-    "losses": 23,
-    "win_rate": 68.1,
+    "wins": 48,
+    "losses": 24,
+    "win_rate": 66.7,
     "events": 18
   }
 }
