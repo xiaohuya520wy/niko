@@ -1341,10 +1341,35 @@ function isLive(ts){
 }
 function statusCn(s){ return s === 'live' ? '进行中' : s === 'done' ? '已结束' : '即将开始'; }
 function statusCls(s){ return s === 'live' ? 's-live' : s === 'done' ? 's-done' : 's-up'; }
+/* 赛事「真正的开赛时间」= 赛程里最早一场的分钟级时间戳。
+   Liquipedia 给的 start 常是赛事首日 00:00Z（北京时间 08:00）的日期占位，
+   直接拿它当开赛时间，会在 08:00 一过就把还没开打的赛事判成「进行中」、
+   倒计时归零（2026-11-11 用户实测：12:30 才开打，09:57 首页已显示进行中）。
+   有具体场次时间时一律以场次为准；完全没有场次才回退到日期级 start。 */
+function eventFirstTs(e){
+  if(!e) return null;
+  let min = null;
+  const take = m => { const t = matchTs(m); if(t && (min === null || t < min)) min = t; };
+  (e.schedule || []).forEach(take);
+  (e.brackets || []).forEach(b => (b.rounds || []).forEach(rd =>
+    (rd.matches || []).forEach(take)));
+  return min;
+}
+function evStart(e){
+  const t = eventFirstTs(e);
+  return t ? new Date(t * 1000).toISOString() : ((e && e.start) || null);
+}
+/* upcoming_tournaments 里的项只有日期级 start，按名称回查 event.json 拿到精确开赛时间 */
+function preciseStart(t){
+  if(!t) return null;
+  const EVS = (evData().events || []);
+  const e = EVS.find(x => (t.id && x.id === t.id) || x.name === t.name
+                          || (t.short && x.short === t.short));
+  return (e && evStart(e)) || t.start || null;
+}
 /* 赛事状态按时间戳实时算（不信赖服务端烤进 JSON 的 status 字符串）。
-   只要 start/end 正确（固定日期，不会过期），无论服务端多久没刷新，
-   浏览器每帧都能给出对的『进行中 / 即将开始 / 已结束』——彻底杜绝
-   “已经开打却显示即将开始”这类因 JSON 暂未刷新导致的展示错误。
+   调用方一律传 evStart(e)（赛程首场的分钟级时间），而不是 e.start 的日期零点，
+   否则赛事当天 08:00 一过就会误判「已开打」。
    赛事中心、赛事详情、首页赛事卡全部走这个函数。 */
 function liveStatus(start, end){
   if(!start) return 'upcoming';
