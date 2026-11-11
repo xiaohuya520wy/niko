@@ -1341,10 +1341,35 @@ function isLive(ts){
 }
 function statusCn(s){ return s === 'live' ? '进行中' : s === 'done' ? '已结束' : '即将开始'; }
 function statusCls(s){ return s === 'live' ? 's-live' : s === 'done' ? 's-done' : 's-up'; }
+/* 赛事「真正的开赛时间」= 赛程里最早一场的分钟级时间戳。
+   Liquipedia 给的 start 常是赛事首日 00:00Z（北京时间 08:00）的日期占位，
+   直接拿它当开赛时间，会在 08:00 一过就把还没开打的赛事判成「进行中」、
+   倒计时归零（2026-11-11 用户实测：12:30 才开打，09:57 首页已显示进行中）。
+   有具体场次时间时一律以场次为准；完全没有场次才回退到日期级 start。 */
+function eventFirstTs(e){
+  if(!e) return null;
+  let min = null;
+  const take = m => { const t = matchTs(m); if(t && (min === null || t < min)) min = t; };
+  (e.schedule || []).forEach(take);
+  (e.brackets || []).forEach(b => (b.rounds || []).forEach(rd =>
+    (rd.matches || []).forEach(take)));
+  return min;
+}
+function evStart(e){
+  const t = eventFirstTs(e);
+  return t ? new Date(t * 1000).toISOString() : ((e && e.start) || null);
+}
+/* upcoming_tournaments 里的项只有日期级 start，按名称回查 event.json 拿到精确开赛时间 */
+function preciseStart(t){
+  if(!t) return null;
+  const EVS = (evData().events || []);
+  const e = EVS.find(x => (t.id && x.id === t.id) || x.name === t.name
+                          || (t.short && x.short === t.short));
+  return (e && evStart(e)) || t.start || null;
+}
 /* 赛事状态按时间戳实时算（不信赖服务端烤进 JSON 的 status 字符串）。
-   只要 start/end 正确（固定日期，不会过期），无论服务端多久没刷新，
-   浏览器每帧都能给出对的『进行中 / 即将开始 / 已结束』——彻底杜绝
-   “已经开打却显示即将开始”这类因 JSON 暂未刷新导致的展示错误。
+   调用方一律传 evStart(e)（赛程首场的分钟级时间），而不是 e.start 的日期零点，
+   否则赛事当天 08:00 一过就会误判「已开打」。
    赛事中心、赛事详情、首页赛事卡全部走这个函数。 */
 function liveStatus(start, end){
   if(!start) return 'upcoming';
@@ -1563,7 +1588,7 @@ function evEntry(){
     const more = all.length > 8 ? `<span class="ev-e-more">+${all.length - 8}</span>` : '';
     return `<a class="ev-e" href="event.html?id=${encodeURIComponent(e.id)}">
       <div class="ev-e-h"><b>${esc(e.short || e.name)}</b>
-        <span class="ev-b ${statusCls(liveStatus(e.start, e.end))}">${statusCn(liveStatus(e.start, e.end))}</span></div>
+        <span class="ev-b ${statusCls(liveStatus(evStart(e), e.end))}">${statusCn(liveStatus(evStart(e), e.end))}</span></div>
       <div class="ev-e-m">${esc(e.name)}</div>
       <div class="ev-e-d">${esc(e.date_text || '')} · ${esc(tierText(e.tier))}${e.prize ? ' · ' + esc(e.prize) : ''}</div>
       ${lg ? `<div class="ev-e-lg">${lg}${more}</div>` : ''}
@@ -1792,19 +1817,12 @@ function seasonBoardHtml(LIST, YS){
 function liveFixture(){
   const EVS = (((evData && evData()) || {}).events) || [];
   const now = Date.now() / 1000;
-  // ★ 找出「时间上最早的即将开赛赛事」(nextEv)。未开赛的候选比赛只从这个赛事取，
-  //   不让更晚的赛事（如 BLAST Rivals）里一场「已定时间」的比赛抢到首页顶部，
-  //   否则顶部会显示成更晚的赛事而非最新/最近的赛事。例：IEM 北京已官宣但 Liquipedia
-  //   尚未公布具体开赛时间（ts=null），此前 liveFixture 跳过它、却把 BLAST Rivals 的
-  //   定时比赛顶了上去，造成「首页顶部不是最新的 IEM 北京」的问题。
-  //   有直播的比赛（pri:0）不受此限，照常优先显示（用户正在看比赛时不应被换成赛事预告）。
-  let nextEv = null;
-  EVS.forEach(e => {
-    const s = Date.parse(e.start || '');
-    if(Number.isFinite(s) && s / 1000 > now){
-      if(!nextEv || s / 1000 < Date.parse(nextEv.start || '') / 1000) nextEv = e;
-    }
-  });
+  // ★ 2026-11-11 修复：旧版用赛事级 e.start（日期零点 00:00Z = 北京时间 08:00）
+  //   挑「最早即将开赛赛事」nextEv，并只收 nextEv 里的未开赛比赛。BLAST Rivals
+  //   首日 09:57 时 start 已过 → nextEv 变成 11-24 的 PGL Major，12:30 的
+  //   Falcons vs Vitality 被整场过滤，首页错显「赛事进行中 / 下一场对阵待公布」、
+  //   倒计时归零。现在只按每场比赛的分钟级 ts 排序：正在打 > 最近一场未开打，
+  //   不再拿日期零点当门槛；按 ts 升序取第一条本身就保证更晚赛事不会抢首页。
   const cand = [];
   // 把 schedule（扁平对阵，a/b 是字符串）与 brackets（matchlist/bracket，a/b 是对象）
   // 统一成 {a,b,sa,sb,ts,bo,round,id}，供 hero 渲染直接用。
@@ -1828,8 +1846,7 @@ function liveFixture(){
                  ts, bo: m.bo || '', round: roundName || m.round || m.stage || '', id: m.id || '' };
     if(isLive(ts)) cand.push({ pri: 0, e, m: nm, ts, playing: true });
     else if(ts > now){
-      // ★ 未开赛比赛：只认 nextEv（最早即将开赛赛事）里的，更晚赛事的不抢首页
-      if(nextEv && e.id !== nextEv.id) return;
+      // 未开赛比赛一律收录，最终按 ts 升序取最近一场（更晚赛事自然抢不到首页）
       cand.push({ pri: 1, e, m: nm, ts, playing: false });
     }
   };
@@ -1854,7 +1871,7 @@ function render(){
   if(LF){
     const m = LF.m, ev = LF.e, playing = !!LF.playing;
     const hasScore = m.sa !== null && m.sb !== null && m.sa !== undefined;
-    heroTag = playing ? (hasScore ? '正在进行' : '即将开始') : '下一场比赛';
+    heroTag = playing ? '正在进行' : '下一场比赛';
     target = new Date(m.ts * 1000).toISOString();
     // 双方队标（取不到时用队名首字母占位）
     const side = name => {
@@ -1881,7 +1898,7 @@ function render(){
       <div class="hero-sub">${esc(d.next_match.event)} · ${boText(d.next_match.bo)}</div>`;
   }else if((d.upcoming_tournaments||[]).length){
     // 跳过「已开打但法尔孔已被淘汰（无下一场）」的当前赛事，直接展示下一个预告赛事
-    const U = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+    const U = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(preciseStart(a)||a.start)-Date.parse(preciseStart(b)||b.start));
     let ti = -1;
     for(let i = 0; i < U.length; i++){
       const t0 = Date.parse(U[i].start);
@@ -1891,9 +1908,10 @@ function render(){
     }
     if(ti < 0) ti = 0;                                    // 兜底：全跳过时仍显示第一项
     const t = U[ti];
-    const t0 = Date.parse(t.start);
+    const tStart = preciseStart(t);      // 精确到分钟：取该赛事首场实际开赛时间
+    const t0 = Date.parse(tStart || t.start);
     const alreadyOn = Number.isFinite(t0) && t0 <= Date.now();
-    heroTag = alreadyOn ? '赛事进行中' : '下一站赛事'; target = t.start;
+    heroTag = alreadyOn ? '赛事进行中' : '下一站赛事'; target = tStart || t.start;
     heroInner = `<div class="vs"><div class="team">${esc(t.name)}</div></div>
       <div class="hero-sub">${esc(t.date_text)} · ${tierText(t.tier)}</div>
       <div class="hero-note">${alreadyOn ? '本轮进行中 · 下一场对阵待公布'
@@ -1907,7 +1925,7 @@ function render(){
   // 下一站赛事提示：当前 hero 赛事（下一场比赛所属锦标赛）之后的下一个锦标赛。
   // 这样「下一站赛事」在首屏 hero 内也能看到，不再被「下一场比赛」挤掉
   // （用户曾问「下一站赛事去哪了」——它一直都在下方「未来赛程」列表，这里补个明示）。
-  const UforNext = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+  const UforNext = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(preciseStart(a)||a.start)-Date.parse(preciseStart(b)||b.start));
   const _curEnd = (LF && LF.e && LF.e.end) ? Date.parse(LF.e.end)
                 : (d.featured && d.featured.end ? Date.parse(d.featured.end) : Date.now());
   const _next = UforNext.find(t => Date.parse(t.start) > _curEnd) || null;
@@ -1918,10 +1936,10 @@ function render(){
       + `<span style="opacity:.75">· ${esc(_next.date_text)} · ${tierText(_next.tier)}</span></div>`;
   }
 
-  const Uall = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(a.start)-Date.parse(b.start));
+  const Uall = (d.upcoming_tournaments||[]).slice().sort((a,b)=>Date.parse(preciseStart(a)||a.start)-Date.parse(preciseStart(b)||b.start));
   // 与 hero 保持一致：跳过「已开打且法尔孔已淘汰」的当前赛事
   const Ushown = Uall.filter(t => {
-    const t0 = Date.parse(t.start);
+    const t0 = Date.parse(preciseStart(t) || t.start);
     const alreadyOn = Number.isFinite(t0) && t0 <= Date.now();
     return !(alreadyOn && !falconsStillIn(t));
   });
