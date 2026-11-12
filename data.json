@@ -77,9 +77,9 @@
       "page": "BLAST/Rivals/2026/Fall",
       "tier": "S-Tier",
       "date_text": "Nov 11–15",
-      "start": "2026-11-11T00:00:00+00:00",
-      "end": "2026-11-15T23:59:59+00:00",
-      "status": "live",
+      "start": "2027-11-11T00:00:00+00:00",
+      "end": "2027-11-15T23:59:59+00:00",
+      "status": "upcoming",
       "url": "https://liquipedia.net/counterstrike/BLAST/Rivals/2026/Fall"
     },
     {
@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-11T19:52:26+00:00"
+    "updated": "2026-11-12T07:27:39+00:00"
   },
   "squad": [
     {
@@ -399,6 +399,89 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-12-legacy",
+      "date": "2026-11-12T02:00:00Z",
+      "opponent": "Legacy",
+      "score": "2-0",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Fall",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          },
+          "opponent": {
+            "rounds": "8",
+            "t": "3",
+            "ct": "5"
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "4",
+            "ct": "9"
+          },
+          "opponent": {
+            "rounds": "6",
+            "t": "3",
+            "ct": "3"
+          }
+        },
+        {
+          "map": "Inferno",
+          "vetoed": true,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2400200/match",
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/tqJdtvoPZ4c?t=25"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/tqJdtvoPZ4c?t=2988"
+          }
+        ],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244121"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244122"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-11-11-vitality",
       "date": "2026-11-11T04:15:00Z",
@@ -7021,11 +7104,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-11",
-    "matches": 72,
-    "wins": 48,
+    "to": "2026-11-12",
+    "matches": 73,
+    "wins": 49,
     "losses": 24,
-    "win_rate": 66.7,
+    "win_rate": 67.1,
     "events": 18
   }
 }
