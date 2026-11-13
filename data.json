@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-13T07:01:55+00:00"
+    "updated": "2026-11-13T19:58:22+00:00"
   },
   "squad": [
     {
@@ -399,6 +399,84 @@
     }
   ],
   "recent_matches": [
+    {
+      "id": "2026-11-13-g2-esports",
+      "date": "2026-11-13T10:55:00Z",
+      "opponent": "G2 Esports",
+      "score": "2-1",
+      "result": "W",
+      "bo": "Bo3",
+      "event": "Fall",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "11",
+            "t": "6",
+            "ct": "5"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "3",
+            "ct": "10"
+          },
+          "opponent": {
+            "rounds": "2",
+            "t": "2",
+            "ct": "0"
+          }
+        },
+        {
+          "map": "Anubis",
+          "vetoed": false,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          },
+          "opponent": {
+            "rounds": "8",
+            "t": "6",
+            "ct": "2"
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2400205/match",
+        "vods": [],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244242"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244246"
+          },
+          {
+            "game": 3,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244256"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
     {
       "id": "2026-11-12-legacy",
       "date": "2026-11-12T02:00:00Z",
@@ -7109,11 +7187,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-12",
-    "matches": 73,
-    "wins": 49,
+    "to": "2026-11-13",
+    "matches": 74,
+    "wins": 50,
     "losses": 24,
-    "win_rate": 67.1,
+    "win_rate": 67.6,
     "events": 18
   }
 }
