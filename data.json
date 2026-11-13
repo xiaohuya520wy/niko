@@ -37,7 +37,7 @@
     "born": "1997 年 2 月 16 日",
     "years_active": "2009 年至今",
     "status": "现役",
-    "winnings": "$2,020,146",
+    "winnings": "$2,018,896",
     "role_liq": "突破位",
     "gear": {
       "mouse": "Razer DeathAdder V3 Pro",
@@ -132,7 +132,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-12T20:10:23+00:00"
+    "updated": "2026-11-13T07:01:55+00:00"
   },
   "squad": [
     {
