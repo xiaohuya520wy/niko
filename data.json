@@ -37,7 +37,7 @@
     "born": "1997 年 2 月 16 日",
     "years_active": "2009 年至今",
     "status": "现役",
-    "winnings": "$2,018,896",
+    "winnings": "$2,026,896",
     "role_liq": "突破位",
     "gear": {
       "mouse": "Razer DeathAdder V3 Pro",
@@ -70,18 +70,6 @@
   },
   "next_match": null,
   "upcoming_tournaments": [
-    {
-      "name": "BLAST Rivals Fall 2026",
-      "short": "BLAST Rivals Fall 2026",
-      "zh": "BLAST Rivals Fall 2026",
-      "page": "BLAST/Rivals/2026/Fall",
-      "tier": "S-Tier",
-      "date_text": "Nov 11–15",
-      "start": "2027-11-11T00:00:00+00:00",
-      "end": "2027-11-15T23:59:59+00:00",
-      "status": "upcoming",
-      "url": "https://liquipedia.net/counterstrike/BLAST/Rivals/2026/Fall"
-    },
     {
       "name": "PGL Major Singapore 2026",
       "short": "PGL Major Singapore 2026",
@@ -132,7 +120,7 @@
       }
     ],
     "note": "个人 rating 数据来自 HLTV（仅逐场核对过的 5 场，其余留空不编造）；赛程与系列赛比分来自 Liquipedia。时区统一按 UTC 存储，前端转换为北京时间。",
-    "updated": "2026-11-14T06:39:29+00:00"
+    "updated": "2026-11-14T18:18:27+00:00"
   },
   "squad": [
     {
@@ -400,6 +388,89 @@
   ],
   "recent_matches": [
     {
+      "id": "2026-11-14-furia",
+      "date": "2026-11-14T10:35:00Z",
+      "opponent": "FURIA",
+      "score": "0-2",
+      "result": "L",
+      "bo": "Bo3",
+      "event": "Fall",
+      "stage": "",
+      "maps": [
+        {
+          "map": "Ancient",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "14",
+            "t": "5",
+            "ct": "7"
+          },
+          "opponent": {
+            "rounds": "16",
+            "t": "5",
+            "ct": "7"
+          }
+        },
+        {
+          "map": "Dust II",
+          "vetoed": false,
+          "falcons_win": false,
+          "falcons": {
+            "rounds": "5",
+            "t": "0",
+            "ct": "5"
+          },
+          "opponent": {
+            "rounds": "13",
+            "t": "7",
+            "ct": "6"
+          }
+        },
+        {
+          "map": "Mirage",
+          "vetoed": true,
+          "falcons_win": true,
+          "falcons": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          },
+          "opponent": {
+            "rounds": "",
+            "t": "",
+            "ct": ""
+          }
+        }
+      ],
+      "links": {
+        "hltv_match": "https://www.hltv.org/matches/2400207/match",
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/JT6x45W302k?t=22"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/JT6x45W302k?t=5120"
+          }
+        ],
+        "hltv_maps": [
+          {
+            "game": 1,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244325"
+          },
+          {
+            "game": 2,
+            "url": "https://www.hltv.org/?pageid=188&matchid=244331"
+          }
+        ]
+      },
+      "niko": {
+        "ratings": []
+      }
+    },
+    {
       "id": "2026-11-13-g2-esports",
       "date": "2026-11-13T10:55:00Z",
       "opponent": "G2 Esports",
@@ -457,7 +528,20 @@
       ],
       "links": {
         "hltv_match": "https://www.hltv.org/matches/2400205/match",
-        "vods": [],
+        "vods": [
+          {
+            "game": 1,
+            "url": "https://youtu.be/oCyxhurYJVk?t=29"
+          },
+          {
+            "game": 2,
+            "url": "https://youtu.be/oCyxhurYJVk?t=3641"
+          },
+          {
+            "game": 3,
+            "url": "https://youtu.be/oCyxhurYJVk?t=5629"
+          }
+        ],
         "hltv_maps": [
           {
             "game": 1,
@@ -7193,11 +7277,11 @@
   "year_stats": {
     "span": "近一年",
     "from": "2025-09-12",
-    "to": "2026-11-13",
-    "matches": 74,
+    "to": "2026-11-14",
+    "matches": 75,
     "wins": 50,
-    "losses": 24,
-    "win_rate": 67.6,
+    "losses": 25,
+    "win_rate": 66.7,
     "events": 18
   }
 }
