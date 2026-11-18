@@ -84,8 +84,17 @@ function ageFromMeta(meta, page, now) {
   return (now - ts) / 3600000;
 }
 async function putHtml(env, page, html) {
+  // ★ 配额优化（2026-11-18）：页面内容没变就跳过写入，省 KV 写额度。
+  //   免费版写仅 1000 次/天，实测稳态已用 750~880；抓取页每 2h 回捞一次，
+  //   大量冷门赛事页内容数周不变，却每轮都重写一遍 html:*，纯属烧写额度。
+  //   读额度 10 万/天、当前仅用 ~12%，用 1 次读换 1 次写非常划算。
+  //   注意：年龄索引 html_meta 的 ts 由 runTick 无条件更新（表示"已检查过该页"），
+  //   与本函数写不写 html:* 解耦，所以跳过写入不会影响抓取调度新鲜度判定。
+  const old = await kvGet(env, htmlKey(page));
+  if (old && typeof old.html === "string" && old.html === html) return false;
   // 只写 html:*；年龄索引(html_meta)由 runTick 统一维护，避免并发 rmw 互相覆盖。
-  return kvPut(env, htmlKey(page), { html, ts: Date.now() });
+  await kvPut(env, htmlKey(page), { html, ts: Date.now() });
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -722,28 +731,38 @@ export async function runTick(env) {
     neededCount: needed.size,
   };
 
-  // 心跳：每次 cron 都把本次结果写入 KV（含 fetchErr），便于在无法直连
-  // workers.dev 时远程观测管线是否在跑、抓取是否被 Liquipedia 拒绝。
+  // ★ 配额优化（2026-11-18）：心跳节流，最多每 25min 写一次，省 ~230 次写/天。
+  //   cron 是 5min 一轮（288 轮/天），旧逻辑每轮都写 last_tick，光心跳就吃掉
+  //   近 30% 的每日写额度。改为：正常轮次距上次心跳 <25min 就跳过；但只要
+  //   ①抓取失败 ②event/data 组装失败 ③距上次已≥25min，就立即写——
+  //   异常可观测性不受影响，稳态心跳新鲜度 ≤25min，足够判断 Worker 是否存活。
   try {
-    await kvPut(env, "last_tick", {
-      at: result.at,
-      fetchedPage,
-      fetchErr,
-      event: {
-        ok: eventResult.ok,
-        reason: eventResult.reason,
-        events: eventResult.events,
-        degraded: eventResult.degraded,
-      },
-      data: {
-        ok: dataResult.ok,
-        reason: dataResult.reason,
-        matches: dataResult.matches,
-        historyRated: dataResult.historyRated,
-      },
-      rating: ratingResult,
-      neededCount: needed.size,
-    });
+    const prevTick = await kvGet(env, "last_tick");
+    const prevAt = prevTick && Date.parse(prevTick.at);
+    const stale = !Number.isFinite(prevAt) || now - prevAt >= 25 * 60 * 1000;
+    const hasError =
+      !!fetchErr || eventResult.ok === false || dataResult.ok === false;
+    if (stale || hasError) {
+      await kvPut(env, "last_tick", {
+        at: result.at,
+        fetchedPage,
+        fetchErr,
+        event: {
+          ok: eventResult.ok,
+          reason: eventResult.reason,
+          events: eventResult.events,
+          degraded: eventResult.degraded,
+        },
+        data: {
+          ok: dataResult.ok,
+          reason: dataResult.reason,
+          matches: dataResult.matches,
+          historyRated: dataResult.historyRated,
+        },
+        rating: ratingResult,
+        neededCount: needed.size,
+      });
+    }
   } catch {
     /* 心跳写入失败不影响主流程 */
   }
