@@ -1585,9 +1585,14 @@ function drawCrosshair(x, boxId){
 
 
 let CUR = null;
-let CUR_URL_DONE = false;   // URL ?id= 深链只在首次 render 采纳；
-                            // 之后由 tab 点击接管。params 是加载时的快照，
-                            // 若每次 render 都读它，点击切换会被旧 URL 强行改回去
+/* URL ?id= 深链目标：加载时取一次快照（params 不会随 replaceState 变）。
+   关键：新赛事只存在于 KV 实时数据、不存在于构建时内联快照里，
+   首屏 render 时 EVS.some(id) 必然为 false。必须每次 render 都重试解析，
+   否则新赛事从首页点进来永远停在旧赛事（2026-11-24 用户实测：
+   PGL Major Singapore 2026 点进去却显示 IEM 北京 2026）。
+   USER_PICKED 保证用户手动点过 tab 后，自动逻辑不再覆盖他的选择。 */
+let URL_WANT = params.get('id');
+let USER_PICKED = false;
 
 function teamChip(name, TM){
   if(!name) return '<em>待定</em>';
@@ -1834,10 +1839,19 @@ function render(){
       <div class="empty" style="margin-top:30px">暂无赛事数据</div>`;
     return;
   }
-  if(!CUR_URL_DONE){
-    const want = params.get('id');
-    if(want && EVS.some(x => x.id === want)) CUR = want;
-    CUR_URL_DONE = true;
+  /* 深链在「用户未手动切换」前每次 render 都重新解析：首屏用旧内联快照解析不到
+     新赛事 id，等 KV 实时数据到达后必须再试一次，才能真正落到新赛事。
+     一旦用户点过 tab，就以他的选择为准，不再被 URL 快照拉回。
+     无有效深链时（直接访问 event.html、或 URL 的 id 在旧快照里还不存在），
+     一律跟随当前数据的 featured——新赛事上线后 KV 一刷新就自动切过去。 */
+  if(!USER_PICKED){
+    if(URL_WANT && EVS.some(x => x.id === URL_WANT)){
+      if(CUR !== URL_WANT) CUR = URL_WANT;
+    }else{
+      const f = data.featured && data.featured.id;
+      if(f && EVS.some(x => x.id === f)){ if(CUR !== f) CUR = f; }
+      else if(!CUR || !EVS.some(x => x.id === CUR)) CUR = EVS[0].id;
+    }
   }
   if(!CUR || !EVS.some(x => x.id === CUR))
     CUR = (data.featured && data.featured.id) || EVS[0].id;
@@ -1866,6 +1880,7 @@ function render(){
   app.querySelectorAll('.ev-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       CUR = btn.getAttribute('data-ev');
+      USER_PICKED = true;   // 用户主动切换：此后 KV 刷新/URL 快照都不再覆盖他的选择
       render();
       history.replaceState(null, '', location.pathname + '?id=' + encodeURIComponent(CUR));
       window.scrollTo({top: 0, behavior: 'smooth'});
