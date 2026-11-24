@@ -1404,6 +1404,21 @@ function matchTs(m){
   }
   return null;
 }
+/* 对手未定占位：Liquipedia 在赛程未抽签时会写 "TBD"，也可能留空。
+   这类场次表示「比赛存在、对手未定」，绝不能当成「没有比赛」丢弃。
+   （2026-11-24 修复：PGL Major Singapore 2026 的五场全是 TBD vs TBD，
+   旧逻辑只认对阵里出现 Falcon，导致首页跳过本届、错显 1 月的布加勒斯特。） */
+function isTbdName(s){ return !s || /^\s*(tbd|to be (announced|determined)|待定)\s*$/i.test(String(s)); }
+/* 赛事参赛名单里是否有法尔孔：这是「已确认参赛」的硬证据，
+   即便赛程还没写队名（全是 TBD）也必须认。 */
+function falconsConfirmed(e){
+  if(!e) return false;
+  for(const t of (e.teams || [])){
+    const n = typeof t === 'string' ? t : (t && t.name);
+    if(/falcon/i.test(n || '')) return true;
+  }
+  return false;
+}
 function featuredEvent(){
   const d = evData(), EVS = d.events || [];
   if(!EVS.length) return null;
@@ -1422,20 +1437,32 @@ function falconsStillIn(t){
                         || (t.id && x.id === t.id));
   if(!e) return false;
   const now = Date.now() / 1000;
+  const all = [];
+  for(const m of (e.schedule || [])) all.push(m);
+  for(const b of (e.brackets || [])) for(const rd of (b.rounds || []))
+    for(const m of (rd.matches || [])) all.push(m);
+  // ★ 2026-11-24 修复：参赛名单确切写了 Falcons，就是「已确认参赛、仍在本届」。
+  //   对阵未公布（全是 TBD）不等于出局。只要赛事还没结束，一律不能跳过本届。
+  //   有未来场次（含 TBD 占位）更直接证明还在打。
+  if(falconsConfirmed(e)){
+    const future = all.some(m => {
+      const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
+      const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
+      const named = /falcon/i.test((an || '') + ' ' + (bn || ''));
+      return (named || isTbdName(an) || isTbdName(bn)) && matchTs(m) > now;
+    });
+    if(future) return true;
+    const end = Date.parse(e.end || t.end || '') / 1000;
+    return !Number.isFinite(end) || end >= now;
+  }
   const hasUpcoming = (m) => {
     const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
     const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
     if(!/falcon/i.test((an || '') + ' ' + (bn || ''))) return false;  // ★ 只要法尔孔
-    // 对手待定（b 为空）的 falcons 场也计入：半决赛对手未定时它才是「还有比赛」
-    // （2026-10-16 修复：旧逻辑 `if(!an||!bn) return false` 会把 falcons 待定场
-    //  误判为「已无下一场」，导致首页 hero 跳过本届、错显「下一站赛事」）
     const ts = matchTs(m);
     return ts && ts >= now;
   };
-  for(const m of (e.schedule || [])) if(hasUpcoming(m)) return true;
-  for(const b of (e.brackets || [])) for(const rd of (b.rounds || []))
-    for(const m of (rd.matches || [])) if(hasUpcoming(m)) return true;
-  return false;
+  return all.some(hasUpcoming);
 }
 
 /* 数据质量分 = 系列赛场次数 + 赛季统计场次数。
@@ -1845,11 +1872,10 @@ function liveFixture(){
     an = an || ''; bn = bn || '';
     if(/^\s*$/.test(an) && /^\s*$/.test(bn)) return;            // 双方都空才跳过
     if(!/falcon/i.test(an + ' ' + bn)) return;                  // ★ 只要法尔孔
-    // 关键修复（2026-10-16）：法尔孔的下一场常「对手待定」（如半决赛对手要看
-    // 另一场结果才定，Liquipedia 上 b 为空）。旧逻辑 `if(!an||!bn) return`
-    // 把这种场直接丢弃，导致 falcons 的下一场永远进不了 hero，首页只能退而
-    // 显示「下一站赛事」（下一个锦标赛）。现在：对手待定也收录，记为 TBD。
-    if(/^tbd$/i.test(an) || /^tbd$/i.test(bn)) return;
+    // 2026-10-16：一方为空/TBD 的 Falcons 场必须收录（对手未定≠没比赛）。
+    // 2026-11-24：不再无条件丢弃 TBD——上一行已确保至少一方是 Falcons，
+    // 因此 "Falcons vs TBD" 是有效场次；只有双方都 TBD 才由下面的合成逻辑处理。
+    if(isTbdName(an) && isTbdName(bn)) return;
     const ts = matchTs(m);
     if(!ts) return;
     const sa = typeof m.a === 'string' ? m.sa : (m.a && m.a.score);
@@ -1868,6 +1894,32 @@ function liveFixture(){
     (e.brackets || []).forEach(b => (b.rounds || []).forEach(rd =>
       (rd.matches || []).forEach(m => collect(e, m, rd.name))));
   });
+  // ★ 2026-11-24：赛程整场都是 TBD vs TBD、但参赛名单确认 Falcons 参赛时，
+  //   合成一条「FALCONS vs 待定」候选（取最早的未开打占位场次时间），
+  //   否则首页会跳过本届、错显更晚的赛事。只取未来场次，避免把占位时间
+  //   误判成「正在进行」（占位不是真实比分）。
+  let syn = null;
+  for(const e of EVS){
+    if(!falconsConfirmed(e)) continue;
+    const end = Date.parse(e.end || '') / 1000;
+    if(Number.isFinite(end) && end < now) continue;
+    const scan = (m, roundName) => {
+      const an = typeof m.a === 'string' ? m.a : (m.a && m.a.name);
+      const bn = typeof m.b === 'string' ? m.b : (m.b && m.b.name);
+      const ts = matchTs(m);
+      if(!ts || ts <= now) return;
+      if(!(isTbdName(an) || isTbdName(bn))) return;
+      if(syn && syn.ts <= ts) return;
+      syn = { pri: 1, e,
+        m: { a: 'Falcons', b: 'TBD', sa: null, sb: null, ts,
+             bo: m.bo || '', round: roundName || m.round || m.stage || '', id: m.id || '' },
+        ts, playing: false };
+    };
+    (e.schedule || []).forEach(m => scan(m, m.round));
+    (e.brackets || []).forEach(b => (b.rounds || []).forEach(rd =>
+      (rd.matches || []).forEach(m => scan(m, rd.name))));
+  }
+  if(syn && (!cand.length || syn.ts < cand[0].ts)) cand.push(syn);
   if(!cand.length) return null;
   cand.sort((x, y) => x.pri - y.pri || x.ts - y.ts);
   return cand[0];
@@ -1888,7 +1940,7 @@ function render(){
     target = new Date(m.ts * 1000).toISOString();
     // 双方队标（取不到时用队名首字母占位）
     const side = name => {
-      const isTBD = !name || /^tbd$/i.test(name);   // 对手待定（半决赛对手未定）
+      const isTBD = isTbdName(name);   // 对手待定（TBD / 空 / 待定）
       const disp = isTBD ? '待定' : name;
       const lg = isTBD ? '' : teamLogo(ev, name);
       return '<div class="hero-team">'
