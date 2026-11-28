@@ -210,6 +210,11 @@ a{color:inherit;text-decoration:none}
   background:var(--grad-num);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--amber);
   font-variant-numeric:tabular-nums;font-feature-settings:"tnum";line-height:1}
 .cd span{font-family:var(--mono);font-size:10px;color:var(--ink2);letter-spacing:.34em;margin-top:8px;display:block;text-transform:uppercase}
+/* 对手待定：不用倒计时，改为一整块显示赛事日期 / 待定 */
+.cd-tbd{grid-template-columns:1fr}
+.cd-tbd div{padding:18px 10px 15px;text-align:center}
+.cd-tbd b{font-family:var(--tech);font-size:28px;letter-spacing:.02em;line-height:1.15}
+.cd-tbd span{letter-spacing:.16em}
 
 /* === 未来赛程卡 === */
 .up{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
@@ -1342,6 +1347,25 @@ function bjDayLabel(ts){
   return (d.getUTCMonth() + 1) + ' 月 ' + d.getUTCDate() + ' 日 · 周'
     + '日一二三四五六'[d.getUTCDay()];
 }
+/* 赛事日期范围（中文）。对手未定时用它代替精确到秒的倒计时：
+   Liquipedia 的 TBD vs TBD 占位场次时间不是真实开赛时间，倒计时会误导。 */
+function eventDateCn(e){
+  if(!e) return '';
+  // 起始日按北京时间（00:00Z -> 当日 08:00 仍是同一天）；
+  // 结束日 Liquipedia 写的是末日 23:59:59Z，若也 +8 会跨到次日，故按 UTC 取日期。
+  const fmt = (iso, bj) => {
+    const t = Date.parse(iso);
+    if(isNaN(t)) return '';
+    const s = new Date(t + (bj ? 8 * 3600 * 1000 : 0)).toISOString();
+    return (+s.slice(5, 7)) + '月' + (+s.slice(8, 10)) + '日';
+  };
+  const s = e.start ? fmt(e.start, true) : '';
+  const en = e.end ? fmt(e.end, false) : '';
+  if(s && en && s !== en) return s + ' – ' + en;
+  if(s) return s;
+  if(en) return en;
+  return e.date_text || '';
+}
 /* 粗略判定「正在打」：开赛时间已过、且仍在 3.2 小时内 */
 function isLive(ts){
   if(!ts) return false;
@@ -1930,7 +1954,7 @@ function render(){
   const c = P.career || {}, g = P.gear || {}, x = P.crosshair || {};
   const maxR = Math.max(...LIST.flatMap(m => (m.niko && m.niko.ratings) || [0]), 1);
 
-  let heroTag, heroInner, target = null;
+  let heroTag, heroInner, target = null, heroCd = null;
   // ① 下一场比赛（赛事中心的实时赛程：进行中 > 最近未开打；同级优先 Falcons 参赛）
   const LF = (typeof liveFixture === 'function') ? liveFixture() : null;
   if(LF){
@@ -1938,6 +1962,15 @@ function render(){
     const hasScore = m.sa !== null && m.sb !== null && m.sa !== undefined;
     heroTag = playing ? '正在进行' : '下一场比赛';
     target = new Date(m.ts * 1000).toISOString();
+    /* 对手未定（TBD / 空 / 待定）时，Liquipedia 给的是占位场次时间，不是真实开赛时间。
+       对它倒计时毫无意义（2026-11-28 用户实测：Falcons vs 待定 却显示「距开赛 00:52:38」）。
+       改为显示赛事日期范围；连日期都没有就显示「待定」。有比分/进行中的真实场次不受影响。 */
+    const oppTbd = isTbdName(m.a) || isTbdName(m.b);
+    if(oppTbd && !playing){
+      target = null;
+      const dateLabel = eventDateCn(ev);
+      heroCd = `<div class="cd cd-tbd"><div><b>${esc(dateLabel || '待定')}</b><span>${dateLabel ? '赛事日期' : '开赛时间'}</span></div></div>`;
+    }
     // 双方队标（取不到时用队名首字母占位）
     const side = name => {
       const isTBD = isTbdName(name);   // 对手待定（TBD / 空 / 待定）
@@ -1955,7 +1988,8 @@ function render(){
       ${side(m.b)}</div>
       <div class="hero-sub">${meta}</div>
       ${playing ? '<div class="hero-note">LIVE 正在进行</div>'
-                : '<div class="hero-note">距本场开赛</div>'}`;
+                : (oppTbd ? '<div class="hero-note">对手待定 · 开赛时间待公布</div>'
+                          : '<div class="hero-note">距本场开赛</div>')}`;
   }else if(d.next_match){
     heroTag = '下一场比赛'; target = d.next_match.datetime;
     heroInner = `<div class="vs"><div class="team">FALCONS</div><div class="vs-mid">VS</div>
@@ -2086,12 +2120,12 @@ function render(){
     <div class="hero-top"><span class="tag">${heroTag}</span></div>
     <div class="hero-body">
       ${heroInner}
-      <div class="cd">
+      ${heroCd || `<div class="cd">
         <div><b id="cdD">--</b><span>天</span></div>
         <div><b id="cdH">--</b><span>时</span></div>
         <div><b id="cdM">--</b><span>分</span></div>
         <div><b id="cdS">--</b><span>秒</span></div>
-      </div>
+      </div>`}
       <div class="hero-sub">${target ? '开赛（北京时间）：' + bj(target) : ''}</div>
       ${FE ? `<div class="hero-cta">进入赛事中心 · 赛程 / 分组 / 分支图<span>›</span></div>` : ''}
     </div>
