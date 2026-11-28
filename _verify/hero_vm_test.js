@@ -180,7 +180,11 @@ check(tb.fixture && tb.fixture.a === 'Falcons' && tb.fixture.b === 'TBD',
   '对手未定的比赛必须进入首页（Falcons vs 待定），不能当成没比赛');
 check(/PGL Major Singapore 2026/.test(tb.hero || ''),
   '首页必须显示 PGL Major Singapore 2026');
-check(/12:00/.test(tb.open || ''), '倒计时目标必须是新加坡首场 12:00，不能跳到 1 月');
-check(tb.cd === '0:03:06:00', '08:54 距 12:00 应为 3 小时 6 分');
+/* 2026-11-28：对手未定时占位场次时间（如 12:00）不是真实开赛时间，
+   倒计时已改为显示赛事日期 / 待定，不能再断言 12:00 倒计时。 */
+check(!/开赛（北京时间）/.test(tb.hero || ''),
+  '对手待定时不得显示精确到分钟的「开赛（北京时间）」占位时间');
+check(/cd-tbd/.test(tb.hero || '') && /11月24日/.test(tb.hero || ''),
+  '对手待定时应显示赛事日期范围（11月24日…），而非秒级倒计时');
 console.log(failed ? `\nREGRESSION FAILED (${failed})` : '\nALL PASS');
 process.exit(failed ? 1 : 0);
